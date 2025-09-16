@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary: #004c99; /* Biru BPJS */
+            --color-primary: #004c99; 
             --color-secondary: #0066cc; /* Biru Terang */
             --color-green: #28a745;    /* Hijau */
             --color-yellow-accent: #ffc107; /* Kuning (untuk highlight/warning) */
-            --color-background: #2a9f34; /* Abu-abu Muda */
+            --color-background: #f0f3f6; /* Abu-abu Muda */
             --color-surface: #ffffff; /* Putih */
             --color-text-dark: #333333;
             --color-text-light: #ffffff;
@@ -216,7 +216,7 @@
         .status-valid { background-color: #28a745; }        /* Hijau */
         .status-belum-tl { background-color: #dc3545; }     /* Merah */
         .status-terdaftar { background-color: #0066cc; }    /* Biru */
-        .status-unknown { background-color: #6c757d; }      /* Abu-abu */
+        .status-unknown { background-color: black; }      /* Abu-abu */
 
         .back-button {
             display: inline-block;
@@ -387,7 +387,7 @@
                                     <th class="col-nilai">Nilai Proyek</th>
                                     <th class="col-sumber">Sumber Dana</th>
                                     <th class="col-status">Status</th>
-                                    <th class="col-date">Tgl SPMK</th>
+                                    <!-- <th class="col-date">Tgl SPMK</th> -->
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
@@ -399,249 +399,6 @@
         </div>
     </div>
 
-    <script>
-        let statusChart = null;
-        let sumberDanaChart = null;
-
-        // Add the same initial data array as in index.html
-        const initialData = [
-            {
-                no: '1',
-                kodeRup: 'RUP001',
-                kodeTender: 'TDR001',
-                kodeProyek: 'PRJ001',
-                namaProyek: 'Pembangunan Gedung A',
-                nilaiProyek: 5000000000,
-                sumberDana: 'APBD',
-                namaInstansi: 'Dinas Pekerjaan Umum',
-                namaPelaksana: 'PT ABC',
-                sumberPotensi: 'Tender',
-                statusPotensi: 'Valid',
-                tglSpmk: '2024-01-15'
-            },
-            {
-                no: '2',
-                kodeRup: 'RUP002',
-                kodeTender: 'TDR002',
-                kodeProyek: 'PRJ002',
-                namaProyek: 'Renovasi Kantor B',
-                nilaiProyek: 3000000000,
-                sumberDana: 'APBN',
-                namaInstansi: 'Dinas Pendidikan',
-                namaPelaksana: 'PT XYZ',
-                sumberPotensi: 'Tender',
-                statusPotensi: 'Belum TL',
-                tglSpmk: '2024-02-01'
-            }
-            // Add more sample data as needed
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const instansiName = urlParams.get('instansi');
-            
-            // Use initialData if no data in localStorage
-            const storedData = localStorage.getItem('projectData');
-            const allData = storedData ? JSON.parse(storedData) : initialData;
-            
-            if (instansiName && allData) {
-                const filteredData = allData.filter(p => p.namaInstansi === instansiName);
-                
-                if (filteredData.length > 0) {
-                    document.getElementById('instansiTitle').textContent = `PROYEK INSTANSI: ${instansiName}`;
-                    updateSummaryCards(filteredData);
-                    updateCharts(filteredData);
-                    updateDataTable(filteredData);
-                } else {
-                    alert('Tidak ada data proyek untuk instansi ini.');
-                    window.location.href = 'index.html';
-                }
-            } else {
-                alert('Tidak ada data instansi yang dipilih atau data tidak ditemukan.');
-                window.location.href = 'index.html';
-            }
-        });
-
-        // Function to format Excel serial date to DD-MM-YYYY string
-        function formatDate(excelDate) {
-            if (!excelDate) return '';
-            
-            let date;
-            if (typeof excelDate === 'number') {
-                const dateObj = new Date(Date.UTC(0, 0, excelDate - 1));
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                date = `${day}-${month}-${year}`;
-            } else {
-                // If it's already a string, assume it's in a format that can be parsed
-                const parts = excelDate.split('-');
-                if (parts.length === 3) {
-                    const [day, month, year] = parts;
-                    date = `${day}-${month}-${year}`;
-                } else {
-                    const dateObj = new Date(excelDate);
-                    if (isNaN(dateObj)) {
-                        return excelDate; // Fallback if parsing fails
-                    }
-                    const year = dateObj.getFullYear();
-                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const day = String(dateObj.getDate()).padStart(2, '0');
-                    date = `${day}-${month}-${year}`;
-                }
-            }
-            return date;
-        }
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
-
-        function updateSummaryCards(data) {
-            const totalProjects = data.length;
-            const totalValue = data.reduce((sum, project) => sum + project.nilaiProyek, 0);
-            const avgValue = totalValue / totalProjects || 0;
-
-            document.getElementById('totalProjects').textContent = totalProjects.toLocaleString('id-ID');
-            document.getElementById('totalValue').textContent = formatCurrency(totalValue);
-            document.getElementById('avgValue').textContent = formatCurrency(avgValue);
-        }
-
-        function updateCharts(data) {
-            updateStatusChart(data);
-            updateSumberDanaChart(data);
-        }
-
-        function updateStatusChart(data) {
-            const statusCounts = {};
-            data.forEach(project => {
-                const status = project.statusPotensi || 'Tidak Diketahui';
-                statusCounts[status] = (statusCounts[status] || 0) + 1;
-            });
-            
-            // Map colors to match status badges
-            const colorMap = {
-                'valid': '#28a745',      // Hijau
-                'belum tl': '#dc3545',   // Merah
-                'terdaftar': '#0066cc',  // Biru
-                'tidak diketahui': '#6c757d' // Abu-abu
-            };
-            
-            const labels = Object.keys(statusCounts);
-            const values = Object.values(statusCounts);
-            const colors = labels.map(label => colorMap[label.toLowerCase()] || '#6c757d');
-
-            if (statusChart) { statusChart.destroy(); }
-
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            statusChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: 'var(--color-surface)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: 'var(--color-text-dark)' } },
-                        tooltip: { callbacks: { label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toLocaleString('id-ID')}` } }
-                    }
-                }
-            });
-        }
-
-        function updateSumberDanaChart(data) {
-            const sumberDanaValues = {};
-            data.forEach(project => {
-                const sumber = project.sumberDana || 'Tidak Diketahui';
-                sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + project.nilaiProyek;
-            });
-
-            const labels = Object.keys(sumberDanaValues);
-            const values = Object.values(sumberDanaValues);
-            const colors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545'];
-
-            if (sumberDanaChart) { sumberDanaChart.destroy(); }
-
-            const ctx = document.getElementById('sumberDanaChart').getContext('2d');
-            sumberDanaChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Total Nilai Proyek',
-                        data: values,
-                        backgroundColor: colors,
-                        borderColor: colors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: (tooltipItem) => `${formatCurrency(tooltipItem.raw)}` } }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { callback: (value) => formatCurrency(value), color: 'var(--color-text-dark)' },
-                            grid: { color: '#e0e0e0' }
-                        },
-                        y: {
-                            ticks: { color: 'var(--color-text-dark)' },
-                            grid: { color: '#e0e0e0' }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateDataTable(data) {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-            
-            data.forEach((project, index) => {
-                const row = document.createElement('tr');
-                const statusClass = getStatusClass(project.statusPotensi);
-                
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${project.kodeRup}</td>
-                    <td>${project.kodeTender}</td>
-                    <td>${project.kodeProyek}</td>
-                    <td>${project.namaProyek}</td>
-                    <td>${formatCurrency(project.nilaiProyek)}</td>
-                    <td>${project.sumberDana}</td>
-                    <td><span class="status-badge ${statusClass}">${project.statusPotensi}</span></td>
-                    <td>${formatDate(project.tglSpmk)}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        function getStatusClass(status) {
-            const cleanStatus = status?.toLowerCase().trim();
-            switch(cleanStatus) {
-                case 'valid': return 'status-valid';
-                case 'belum tl': return 'status-belum-tl';
-                case 'terdaftar': return 'status-terdaftar';
-                default: return 'status-unknown';
-            }
-        }
-    </script>
+    <script src="js/detail.js"></script>
 </body>
 </html>

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Potensi Jakon</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -51,6 +50,8 @@
             background-color: var(--color-surface);
             padding: 10px 20px;
             margin-bottom: 10px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
         }
 
         .header-section {
@@ -61,6 +62,7 @@
         .header-logo {
             height: 60px;
             margin-right: 15px;
+            border-radius: 8px;
         }
         
         .header-logo:last-of-type {
@@ -82,6 +84,7 @@
         .header-title p {
             font-size: 0.9rem;
             color: #666;
+            font-style: italic;
         }
 
         .header-person {
@@ -97,22 +100,26 @@
             align-items: center;
             background-color: var(--color-green);
             color: var(--color-text-light);
-            padding: 5px 15px;
+            padding: 8px 15px;
             margin-bottom: 10px;
             font-weight: 500;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
         }
         
-        .home-button {
+        .home-button, .refresh-button {
             background-color: var(--color-surface);
             color: var(--color-primary);
             padding: 8px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
 
-        .home-button:hover {
+        .home-button:hover, .refresh-button:hover {
             background-color: #e9eef2;
             transform: translateY(-2px);
         }
@@ -130,55 +137,11 @@
             padding: 15px;
             margin-bottom: 15px;
             border: 1px solid #edf2f7;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
         }
 
-        .import-section .file-input-wrapper {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        
-        #fileInputLabel {
-            background: var(--color-secondary);
-            color: var(--color-text-light);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #fileInputLabel:hover {
-            background: #005aa7;
-            transform: translateY(-2px);
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .template-info {
-            background: #f0f3f6;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--color-primary);
-            font-size: 0.9rem;
-            color: #555;
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-        
         .dashboard {
-            display: none;
-        }
-
-        .dashboard.active {
             display: flex;
             gap: 15px;
         }
@@ -216,11 +179,19 @@
             align-items: center;
         }
 
-        .card.total-projects { background-color: var(--color-green); }
-        .card.total-value { background-color: var(--color-primary); }
-        .card.avg-value { background-color: var(--color-secondary); }
-        .card.total-instansi { background-color: var(--color-yellow-accent); color: var(--color-text-dark); }
-
+        .card.total-projects { 
+            background: linear-gradient(135deg, var(--color-green), #20c997); 
+        }
+        .card.total-value { 
+            background: linear-gradient(135deg, var(--color-primary), #0056b3); 
+        }
+        .card.avg-value { 
+            background: linear-gradient(135deg, var(--color-secondary), #0052cc); 
+        }
+        .card.total-instansi { 
+            background: linear-gradient(135deg, var(--color-yellow-accent), #e0a800); 
+            color: var(--color-text-dark); 
+        }
 
         .card:hover {
             transform: translateY(-5px);
@@ -255,6 +226,8 @@
         .chart-card {
             background-color: var(--color-surface);
             padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
         }
 
         .chart-card h3 {
@@ -299,7 +272,7 @@
         }
 
         .data-table th {
-            background-color: var(--color-primary);
+            background: linear-gradient(135deg, var(--color-primary), #0056b3);
             color: var(--color-text-light);
             font-weight: 600;
             position: sticky;
@@ -354,6 +327,29 @@
             color: var(--color-primary);
         }
 
+        .status-indicator {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-online {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         @media (min-width: 992px) {
             .charts-container {
                 grid-template-columns: 1fr 1fr;
@@ -361,7 +357,7 @@
         }
         
         @media (max-width: 1200px) {
-            .dashboard.active {
+            .dashboard {
                 flex-direction: column;
             }
             .dashboard-side {
@@ -386,7 +382,7 @@
                 width: 100%;
             }
             .header-logo, .header-person {
-                height: 60px;  /* Changed from 40px */
+                height: 60px;
                 margin: 0 5px;
             }
             h1 {
@@ -398,12 +394,30 @@
             .charts-container {
                 grid-template-columns: 1fr;
             }
-            .import-section .file-input-wrapper {
-                flex-direction: column;
-            }
             .chart-container {
                 height: 200px;
             }
+            .top-bar {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--color-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -423,11 +437,18 @@
                 <img src="wakil.png" alt="Wakil Walikota Medan" class="header-person">
             </div>
         </header>
+        
         <div class="top-bar">
-            <div class="top-bar-left" id="currentDate"></div>
+            <div class="top-bar-left">
+                <span id="currentDate"></span>
+                <span class="status-indicator status-loading" id="connectionStatus">Memuat...</span>
+            </div>
+            <div class="top-bar-right">
+                <span style="font-size: 0.9em;">Data dari Google Sheets</span>
+            </div>
         </div>
 
-        <div id="dashboard" class="dashboard active">
+        <div id="dashboard" class="dashboard">
             <div class="dashboard-main">
                 <div class="panel">
                     <h2>Ringkasan Total Proyek</h2>
@@ -480,6 +501,12 @@
                                 </tr>
                             </thead>
                             <tbody id="mainTableBody">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; padding: 20px; color: #666;">
+                                        <div class="loading-spinner"></div>
+                                        <p style="margin-top: 10px;">Memuat data...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -490,216 +517,437 @@
 
     <script>
         let statusChart = null;
-        let sumberDanaChart = null;
-        
-        // Define initial data
-        const projectData = [
-            {
-                no: '1',
-                kodeRup: 'RUP001',
-                kodeTender: 'TDR001',
-                kodeProyek: 'PRJ001',
-                namaProyek: 'Pembangunan Gedung A',
-                nilaiProyek: 5000000000,
-                sumberDana: 'APBD',
-                namaInstansi: 'Dinas Pekerjaan Umum',
-                namaPelaksana: 'PT ABC',
-                sumberPotensi: 'Tender',
-                statusPotensi: 'Valid',
-                tglSpmk: '2024-01-15'
-            },
-            {
-                no: '2',
-                kodeRup: 'RUP002',
-                kodeTender: 'TDR002',
-                kodeProyek: 'PRJ002',
-                namaProyek: 'Renovasi Kantor B',
-                nilaiProyek: 3000000000,
-                sumberDana: 'APBN',
-                namaInstansi: 'Dinas Pendidikan',
-                namaPelaksana: 'PT XYZ',
-                sumberPotensi: 'Tender',
-                statusPotensi: 'Belum TL',
-                tglSpmk: '2024-02-01'
+let sumberDanaChart = null;
+
+// Configuration for Google Sheets API
+const SHEET_CONFIG = {
+    sheetId: "1h9NVeC4Gca7IwQkuLd3kNSqaO4xLbgCBIMQK7I26HGs",
+    apiKey: "AIzaSyDDChj-Syqytv2HboLnbflQu7-u_5VAYIE",
+    range: "A2:M1000" // Adjust range as needed
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    updateCurrentDate();
+    updateConnectionStatus('loading', 'Memuat data...');
+    
+    try {
+        const data = await fetchGoogleSheetsData();
+        if (data && data.length > 0) {
+            updateDashboard(data);
+            updateConnectionStatus('online', `${data.length} data berhasil dimuat`);
+           
+            
+            // Store data for potential offline use
+            try {
+                const dataToStore = JSON.stringify(data);
+                if (typeof(Storage) !== "undefined") {
+                    sessionStorage.setItem('projectData', dataToStore);
+                }
+            } catch (e) {
+                console.log("Note: Could not store data in session storage");
             }
-            // Add more data entries here as needed
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const storedData = localStorage.getItem('projectData');
-            const allData = storedData ? JSON.parse(storedData) : projectData;
-            updateDashboard(allData);
-            updateCurrentDate();
-        });
-
-        function processData(rawData) {
-            return rawData.map(row => ({
-                no: row['NO'] || '',
-                kodeRup: row['KODE RUP'] || '',
-                kodeTender: row['KODE TENDER'] || '',
-                kodeProyek: row['KODE PROYEK'] || '',
-                namaProyek: row['NAMA PROYEK'] || '',
-                nilaiProyek: parseFloat(String(row['NILAI PROYEK'] || '0').replace(/[^\d.-]/g, '')) || 0,
-                sumberDana: row['SUMBER DANA'] || '',
-                namaInstansi: row['NAMA INSTANSI / SATKER'] || row['NAMA INSTANSI'] || '',
-                namaPelaksana: row['NAMA PELAKSANA'] || '',
-                sumberPotensi: row['SUMBER POTENSI'] || '',
-                statusPotensi: row['STATUS POTENSI'] || '',
-                tglSpmk: row['TGL SPMK'] || ''
-            }));
+        } else {
+            console.log("⚠️ No data found");
+            updateConnectionStatus('error', 'Tidak ada data');
         }
+    } catch (error) {
+        console.error("❌ Error loading data:", error);
+        updateConnectionStatus('error', 'Error memuat data');
+        showError("Gagal memuat data dari Google Sheets. Silakan coba lagi.");
+    }
+    
+    // Add refresh button
+    addRefreshButton();
+});
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
-
-        function updateDashboard(data) {
-            updateSummaryCards(data);
-            updateCharts(data);
-            updateMainTable(data);
-        }
-
-        function updateSummaryCards(data) {
-            const totalProjects = data.length;
-            const totalValue = data.reduce((sum, project) => sum + project.nilaiProyek, 0);
-            const avgValue = totalValue / totalProjects || 0;
-            const uniqueInstansi = new Set(data.map(p => p.namaInstansi).filter(i => i)).size;
-
-            document.getElementById('totalProjects').textContent = totalProjects.toLocaleString('id-ID');
-            document.getElementById('totalValue').textContent = formatCurrency(totalValue);
-            document.getElementById('avgValue').textContent = formatCurrency(avgValue);
-            document.getElementById('totalInstansi').textContent = uniqueInstansi.toLocaleString('id-ID');
-        }
-
-        function updateCharts(data) {
-            updateStatusChart(data);
-            updateSumberDanaChart(data);
-        }
-
-        function updateStatusChart(data) {
-            const statusCounts = {};
-            data.forEach(project => {
-                const status = project.statusPotensi || 'Tidak Diketahui';
-                statusCounts[status] = (statusCounts[status] || 0) + 1;
-            });
-            
-            // Map colors to match status badges
-            const colorMap = {
-                'valid': '#28a745',      // Hijau
-                'belum tl': '#dc3545',   // Merah
-                'terdaftar': '#0066cc',  // Biru
-                'tidak diketahui': '#6c757d' // Abu-abu
-            };
-            
-            const labels = Object.keys(statusCounts);
-            const values = Object.values(statusCounts);
-            const colors = labels.map(label => colorMap[label.toLowerCase()] || '#6c757d');
-
-            if (statusChart) { statusChart.destroy(); }
-
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            statusChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: 'var(--color-surface)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: 'var(--color-text-dark)' } },
-                        tooltip: { callbacks: { label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toLocaleString('id-ID')}` } }
-                    }
-                }
-            });
-        }
-
-        function updateSumberDanaChart(data) {
-            const sumberDanaValues = {};
-            data.forEach(project => {
-                const sumber = project.sumberDana || 'Tidak Diketahui';
-                sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + project.nilaiProyek;
-            });
-
-            const labels = Object.keys(sumberDanaValues);
-            const values = Object.values(sumberDanaValues);
-            const colors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545'];
-
-            if (sumberDanaChart) { sumberDanaChart.destroy(); }
-
-            const ctx = document.getElementById('sumberDanaChart').getContext('2d');
-            sumberDanaChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Total Nilai Proyek',
-                        data: values,
-                        backgroundColor: colors,
-                        borderColor: colors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: (tooltipItem) => `${formatCurrency(tooltipItem.raw)}` } }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { callback: (value) => formatCurrency(value), color: 'var(--color-text-dark)' },
-                            grid: { color: '#e0e0e0' }
-                        },
-                        y: {
-                            ticks: { color: 'var(--color-text-dark)' },
-                            grid: { color: '#e0e0e0' }
-                        }
-                    }
-                }
-            });
+async function fetchGoogleSheetsData() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_CONFIG.sheetId}/values/${SHEET_CONFIG.range}?key=${SHEET_CONFIG.apiKey}`;
+    
+    try {
+        console.log("📡 Fetching data from Google Sheets...");
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        function updateMainTable(data) {
-            const instansiCounts = {};
-            data.forEach(project => {
-                const instansi = project.namaInstansi || 'Tidak Diketahui';
-                instansiCounts[instansi] = (instansiCounts[instansi] || 0) + 1;
-            });
-            
-            const sortedInstansi = Object.keys(instansiCounts).sort((a, b) => instansiCounts[b] - instansiCounts[a]);
-            mainTableBody.innerHTML = '';
-            
-            sortedInstansi.forEach((instansi, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><a href="detail.html?instansi=${encodeURIComponent(instansi)}" class="instansi-link">${instansi}</a></td>
-                    <td class="center-text">${instansiCounts[instansi]}</td>
-                `;
-                mainTableBody.appendChild(row);
-            });
+        const result = await response.json();
+        
+        if (!result.values || result.values.length === 0) {
+            console.log("⚠️ No data found in the specified range");
+            return [];
         }
+        
+        // Process the raw data from Google Sheets
+        const data = result.values.map((row, index) => {
+            // Map the columns based on the structure visible in your screenshot
+            return {
+                'NO': row[0] || (index + 1).toString(),
+                'KODE RUP': row[1] || '',
+                'KODE TENDER': row[2] || '',
+                'KODE PROYEK': row[3] || '',
+                'NAMA PROYEK': row[4] || '',
+                'NILAI PROYEK': row[5] || '0',
+                'SUMBER DANA': row[6] || 'Tidak Diketahui',
+                'NAMA INSTANSI': row[7] || 'Tidak Diketahui',
+                'NAMA PELAKSANA': row[8] || '',
+                'SUMBER POTENSI': row[9] || '',
+                'STATUS POTENSI': row[10] || 'Tidak Diketahui',
+                'TGL SPMK': row[11] || ''
+            };
+        });
+        
+        return processData(data);
+        
+    } catch (error) {
+        console.error("❌ Error fetching Google Sheets data:", error);
+        throw error;
+    }
+}
 
-        function updateCurrentDate() {
-            const now = new Date();
-            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+function processData(rawData) {
+    return rawData.map((row, index) => {
+        // Clean and process the data
+        const nilaiProyek = cleanCurrencyValue(row['NILAI PROYEK'] || '0');
+        
+        return {
+            no: row['NO'] || (index + 1).toString(),
+            kodeRup: row['KODE RUP'] || '',
+            kodeTender: row['KODE TENDER'] || '',
+            kodeProyek: row['KODE PROYEK'] || '',
+            namaProyek: row['NAMA PROYEK'] || '',
+            nilaiProyek: nilaiProyek,
+            sumberDana: row['SUMBER DANA'] || 'Tidak Diketahui',
+            namaInstansi: row['NAMA INSTANSI'] || 'Tidak Diketahui',
+            namaPelaksana: row['NAMA PELAKSANA'] || '',
+            sumberPotensi: row['SUMBER POTENSI'] || '',
+            statusPotensi: row['STATUS POTENSI'] || 'Tidak Diketahui',
+            tglSpmk: row['TGL SPMK'] || ''
+        };
+    }).filter(item => item.namaProyek && item.namaProyek.trim() !== '' && item.namaProyek !== 'Tidak Diketahui');
+}
+
+function cleanCurrencyValue(value) {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+        // Remove all non-numeric characters except dots and minus signs
+        const cleaned = value.replace(/[^\d.-]/g, '');
+        const parsed = parseFloat(cleaned) || 0;
+        return parsed;
+    }
+    return 0;
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+function updateDashboard(data) {
+    updateSummaryCards(data);
+    updateCharts(data);
+    updateMainTable(data);
+}
+
+function updateSummaryCards(data) {
+    const totalProjects = data.length;
+    const totalValue = data.reduce((sum, project) => sum + project.nilaiProyek, 0);
+    const avgValue = totalValue / totalProjects || 0;
+    const uniqueInstansi = new Set(data.map(p => p.namaInstansi).filter(i => i && i !== 'o')).size;
+
+    document.getElementById('totalProjects').textContent = totalProjects.toLocaleString('id-ID');
+    document.getElementById('totalValue').textContent = formatCurrency(totalValue);
+    document.getElementById('avgValue').textContent = formatCurrency(avgValue);
+    document.getElementById('totalInstansi').textContent = uniqueInstansi.toLocaleString('id-ID');
+}
+
+function updateCharts(data) {
+    updateStatusChart(data);
+    console.log(data)
+    updateSumberDanaChart(data);
+}
+
+function updateStatusChart(data) {
+    const statusCounts = {};
+    
+    data.forEach(project => {
+        const status = project.tglSpmk || 'Tidak Diketahui';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+    
+    const colorMap = {
+        'valid': '#28a745',
+        'belum tl': '#dc3545',
+        'terdaftar': '#0066cc',
+        'tidak diketahui': '#6c757d',
+        'lkpp': '#ffc107'
+    };
+    
+    const labels = Object.keys(statusCounts);
+    const values = Object.values(statusCounts);
+    const colors = labels.map(label => colorMap[label.toLowerCase()] || '#6c757d');
+
+    if (statusChart) { 
+        statusChart.destroy(); 
+    }
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: 'var(--color-surface)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        color: 'var(--color-text-dark)',
+                        usePointStyle: true,
+                        padding: 20
+                    } 
+                },
+                tooltip: { 
+                    callbacks: { 
+                        label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toLocaleString('id-ID')} proyek` 
+                    } 
+                }
+            }
         }
+    });
+}
+
+function updateSumberDanaChart(data) {
+    const sumberDanaValues = {};
+    data.forEach(project => {
+        const sumber = project.sumberDana || 'Tidak Diketahui';
+        sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + project.nilaiProyek;
+    });
+
+    const labels = Object.keys(sumberDanaValues);
+    const values = Object.values(sumberDanaValues);
+    const colors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
+
+    if (sumberDanaChart) { 
+        sumberDanaChart.destroy(); 
+    }
+
+    const ctx = document.getElementById('sumberDanaChart').getContext('2d');
+    sumberDanaChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Nilai Proyek',
+                data: values,
+                backgroundColor: colors,
+                borderColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: { 
+                    callbacks: { 
+                        label: (tooltipItem) => `${formatCurrency(tooltipItem.raw)}` 
+                    } 
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { 
+                        callback: (value) => formatCurrency(value), 
+                        color: 'var(--color-text-dark)' 
+                    },
+                    grid: { color: '#e0e0e0' }
+                },
+                y: {
+                    ticks: { 
+                        color: 'var(--color-text-dark)',
+                        font: { size: 11 }
+                    },
+                    grid: { color: '#e0e0e0' }
+                }
+            }
+        }
+    });
+}
+
+function updateMainTable(data) {
+    const instansiCounts = {};
+    const instansiValues = {};
+    
+    data.forEach(project => {
+        const instansi = project.namaInstansi || 'Tidak Diketahui';
+        instansiCounts[instansi] = (instansiCounts[instansi] || 0) + 1;
+        instansiValues[instansi] = (instansiValues[instansi] || 0) + project.nilaiProyek;
+    });
+    
+    const sortedInstansi = Object.keys(instansiCounts).sort((a, b) => instansiCounts[b] - instansiCounts[a]);
+    const mainTableBody = document.getElementById('mainTableBody');
+    mainTableBody.innerHTML = '';
+    console.log(sortedInstansi)
+    sortedInstansi.forEach((instansi, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>
+                <a href="detail.html?instansi=${encodeURIComponent(instansi)}" class="instansi-link">
+                    ${instansi}
+                </a>
+                <div style="font-size: 0.8em; color: #666; margin-top: 2px;">
+                    Total: ${formatCurrency(instansiValues[instansi])}
+                </div>
+            </td>
+            <td class="center-text">${instansiCounts[instansi]}</td>
+        `;
+        mainTableBody.appendChild(row);
+    });
+}
+
+function updateCurrentDate() {
+    const now = new Date();
+    const options = { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        timeZone: 'Asia/Jakarta'
+    };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+}
+
+function updateConnectionStatus(status, message) {
+    const statusElement = document.getElementById('connectionStatus');
+    if (statusElement) {
+        statusElement.className = `status-indicator status-${status}`;
+        statusElement.textContent = message;
+    }
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.innerHTML = `
+        <div style="position: fixed; top: 20px; right: 20px; background: #dc3545; color: white; padding: 15px; border-radius: 8px; z-index: 10000; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            <strong>Error:</strong> ${message}
+            <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: 10px;">&times;</button>
+        </div>
+    `;
+    document.body.appendChild(errorDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+function addRefreshButton() {
+    const topBarRight = document.querySelector('.top-bar-right');
+    if (topBarRight) {
+        const refreshButton = document.createElement('button');
+        refreshButton.innerHTML = '🔄 Refresh';
+        refreshButton.className = 'refresh-button';
+        refreshButton.style.cssText = `
+            background: var(--color-surface);
+            color: var(--color-primary);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        `;
+        refreshButton.onclick = refreshData;
+        refreshButton.onmouseover = function() {
+            this.style.background = '#e9eef2';
+            this.style.transform = 'translateY(-1px)';
+        };
+        refreshButton.onmouseout = function() {
+            this.style.background = 'var(--color-surface)';
+            this.style.transform = 'translateY(0)';
+        };
+        topBarRight.appendChild(refreshButton);
+    }
+}
+
+// Function to manually refresh data
+function refreshData() {
+    updateConnectionStatus('loading', 'Memuat ulang...');
+    
+    fetchGoogleSheetsData()
+        .then(data => {
+            if (data && data.length > 0) {
+                updateDashboard(data);
+                updateConnectionStatus('online', `${data.length} data berhasil dimuat`);
+                console.log(`✅ Data refreshed successfully: ${data.length} records`);
+                
+                // Show success message briefly
+                const successDiv = document.createElement('div');
+                successDiv.innerHTML = `
+                    <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        ✅ Data berhasil diperbarui!
+                    </div>
+                `;
+                document.body.appendChild(successDiv);
+                setTimeout(() => {
+                    if (successDiv.parentElement) {
+                        successDiv.remove();
+                    }
+                }, 3000);
+            } else {
+                updateConnectionStatus('error', 'Tidak ada data');
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error refreshing data:", error);
+            updateConnectionStatus('error', 'Error memuat data');
+            showError("Gagal memperbarui data. Silakan coba lagi.");
+        });
+}
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+    console.log("🔄 Auto-refreshing data...");
+    refreshData();
+}, 5 * 60 * 1000);
+
+async function getSheetInfo() {
+    const sheetId = SHEET_CONFIG.sheetId;
+    const apiKey = SHEET_CONFIG.apiKey;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("📊 Available sheets:", data.sheets?.map(s => s.properties.title));
+        return data.sheets;
+    } catch (error) {
+        console.error("Error getting sheet info:", error);
+        return null;
+    }
+}
     </script>
 </body>
 </html>
