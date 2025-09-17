@@ -21,6 +21,11 @@
             --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -35,12 +40,10 @@
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 10px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
         }
 
         header {
@@ -144,19 +147,15 @@
         .dashboard {
             display: flex;
             gap: 15px;
+            overflow: hidden;
+            min-height: 0;
         }
         
-        .dashboard-main {
-            flex: 2;
+        .dashboard-main,
+        .dashboard-side {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-        }
-
-        .dashboard-side {
-            flex: 1;
-            min-width: 350px;
-            max-width: 450px;
+            min-height: 0;     
         }
 
         .summary-cards {
@@ -249,14 +248,14 @@
         }
 
         .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-            background: white;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;   
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-table-container {
+            height: auto; 
         }
 
         .data-table th,
@@ -431,10 +430,6 @@
             <div class="header-title">
                 <h1>DASHBOARD POTENSI JAKON</h1>
                 <p>(Occupational Safety Guarantee for Construction Services)</p>
-            </div>
-            <div class="header-section">
-                <img src="walkot.png" alt="Walikota Medan" class="header-person">
-                <img src="wakil.png" alt="Wakil Walikota Medan" class="header-person">
             </div>
         </header>
         
