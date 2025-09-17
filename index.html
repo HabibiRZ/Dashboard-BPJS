@@ -426,9 +426,9 @@
         <header>
             <div class="header-section">
                 <img src="medan.png" alt="Logo Kota Medan" class="header-logo">
-                <img src="logo.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
-                <img src="kemendagri.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
-                <img src="kemenko.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
+                <img src="pemprovsu.png" alt="Logo Pemprovsu" class="header-logo">
+                <!-- <img src="kemendagri.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
+                <img src="kemenko.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo"> -->
             </div>
             <div class="header-title">
                 <h1>DASHBOARD POTENSI JAKON</h1>
@@ -436,9 +436,10 @@
             </div>
 
             <div class="header-section">
-                <img src="kementrianketenagakerjaan.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-person">
+                <img src="logo.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">    
+                <!-- <img src="kementrianketenagakerjaan.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-person">
                 <img src="paritrana.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-person">
-                <img src="walkotmedan.jpg" alt="Walikota Medan" class="header-person">
+                <img src="walkotmedan.jpg" alt="Walikota Medan" class="header-person"> -->
             </div>
 
         </header>
@@ -596,11 +597,12 @@ async function fetchGoogleSheetsData() {
                 'NAMA PROYEK': row[4] || '',
                 'NILAI PROYEK': row[5] || '0',
                 'SUMBER DANA': row[6] || 'Tidak Diketahui',
-                'NAMA INSTANSI': row[7] || 'Tidak Diketahui',
-                'NAMA PELAKSANA': row[8] || '',
-                'SUMBER POTENSI': row[9] || '',
-                'STATUS POTENSI': row[10] || 'Tidak Diketahui',
-                'TGL SPMK': row[11] || ''
+                'NAMA PEMILIK': row[7] || 'Tidak Diketahui',
+                'NAMA INSTANSI': row[8] || 'Tidak Diketahui',
+                'NAMA PELAKSANA': row[9] || '',
+                'SUMBER POTENSI': row[10] || '',
+                'STATUS POTENSI': row[11] || 'Tidak Diketahui',
+                'TGL SPMK': row[12] || ''
             };
         });
         
@@ -625,6 +627,7 @@ function processData(rawData) {
             namaProyek: row['NAMA PROYEK'] || '',
             nilaiProyek: nilaiProyek,
             sumberDana: row['SUMBER DANA'] || 'Tidak Diketahui',
+            namaPemilik: row['NAMA PEMILIK'] || 'Tidak Diketahui',
             namaInstansi: row['NAMA INSTANSI'] || 'Tidak Diketahui',
             namaPelaksana: row['NAMA PELAKSANA'] || '',
             sumberPotensi: row['SUMBER POTENSI'] || '',
@@ -682,7 +685,7 @@ function updateStatusChart(data) {
     const statusCounts = {};
     
     data.forEach(project => {
-        const status = project.tglSpmk || 'Tidak Diketahui';
+        const status = project.statusPotensi || 'Tidak Diketahui';
         statusCounts[status] = (statusCounts[status] || 0) + 1;
     });
     

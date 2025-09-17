@@ -325,11 +325,12 @@
 <body>
     <div class="container">
         <header>
-            <img src="logo.png" alt="Logo BPJS Ketenagakerjaan">
             <img src="medan.png" alt="Logo Kota Medan" class="header-logo">
+            <img src="pemprovsu.png" alt="Logo Kota Medan" class="header-logo">
             <h1><span id="instansiTitle"></span></h1>
-            <img src="kemendagri.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
-            <img src="kemenko.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
+            <img src="logo.png" alt="Logo BPJS Ketenagakerjaan">
+            <!-- <img src="kemendagri.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
+            <img src="kemenko.jpg" alt="Logo BPJS Ketenagakerjaan" class="header-logo"> -->
         </header>
 
         <a href="index.html" class="back-button">← Kembali ke Dashboard Utama</a>
@@ -404,8 +405,8 @@
 
     <script>
         let statusChart = null;
-let sumberDanaChart = null;
-let currentInstansi = null;
+        let sumberDanaChart = null;
+        let currentInstansi = null;
 
 // Configuration for Google Sheets API (sama dengan main)
 const SHEET_CONFIG = {
@@ -484,7 +485,7 @@ async function fetchGoogleSheetsData() {
         // Headers sesuai dengan struktur data
         const headers = [
             'NO', 'KODE RUP', 'KODE TENDER', 'KODE PROYEK', 'NAMA PROYEK',
-            'NILAI PROYEK', 'SUMBER DANA', 'NAMA INSTANSI', 'NAMA PELAKSANA',
+            'NILAI PROYEK', 'SUMBER DANA','NAMA PEMILIK', 'NAMA INSTANSI', 'NAMA PELAKSANA',
             'SUMBER POTENSI', 'STATUS POTENSI', 'TGL SPMK'
         ];
         
@@ -517,7 +518,8 @@ function processData(rawData) {
             namaProyek: row['NAMA PROYEK'] || '',
             nilaiProyek: nilaiProyek,
             sumberDana: row['SUMBER DANA'] || 'Tidak Diketahui',
-            namaInstansi: row['NAMA INSTANSI'] || row['NAMA INSTANSI / SATKER'] || 'Tidak Diketahui',
+            namaPemilik: row['NAMA PEMILIK'] || 'Tidak Diketahui',
+            namaInstansi: row['NAMA INSTANSI'] || 'Tidak Diketahui',
             namaPelaksana: row['NAMA PELAKSANA'] || '',
             sumberPotensi: row['SUMBER POTENSI'] || '',
             statusPotensi: row['STATUS POTENSI'] || 'Tidak Diketahui',
@@ -648,7 +650,7 @@ function updateStatusChart(data) {
     const statusCounts = {};
     console.log(data)
     data.forEach(project => {
-        const status = project.tglSpmk;
+        const status = project.statusPotensi;
         statusCounts[status] = (statusCounts[status] || 0) + 1;
     });
     
@@ -777,8 +779,8 @@ function updateDetailTable(data) {
         const row = document.createElement('tr');
         
         // Format status badge
-        const statusClass = getStatusBadgeClass(project.tglSpmk);
-        const statusBadge = `<span class="status-badge ${statusClass}">${project.tglSpmk}</span>`;
+        const statusClass = getStatusBadgeClass(project.statusPotensi);
+        const statusBadge = `<span class="status-badge ${statusClass}">${project.statusPotensi}</span>`;
         
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -798,7 +800,6 @@ function updateDetailTable(data) {
             <td>${statusBadge}</td>
             
         `;
-        // <td>${project.tglSpmk || '-'}</td>
         tableBody.appendChild(row);
     });
     
