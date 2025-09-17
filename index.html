@@ -21,11 +21,6 @@
             --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -40,10 +35,12 @@
         }
 
         .container {
-            height: 100vh;
-            display: grid;
-            grid-template-rows: auto auto 1fr;
-            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -147,15 +144,19 @@
         .dashboard {
             display: flex;
             gap: 15px;
-            overflow: hidden;
-            min-height: 0;
         }
         
-        .dashboard-main,
-        .dashboard-side {
+        .dashboard-main {
+            flex: 2;
             display: flex;
             flex-direction: column;
-            min-height: 0;     
+            gap: 15px;
+        }
+
+        .dashboard-side {
+            flex: 1;
+            min-width: 350px;
+            max-width: 450px;
         }
 
         .summary-cards {
@@ -239,7 +240,7 @@
 
         .chart-container {
             position: relative;
-            height: 210px;
+            height: 250px;
         }
         
         .data-table-container {
@@ -248,14 +249,14 @@
         }
 
         .data-table {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;   
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .data-table-container {
-            height: auto; 
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            background: white;
         }
 
         .data-table th,
@@ -431,6 +432,11 @@
                 <h1>DASHBOARD POTENSI JAKON</h1>
                 <p>(Occupational Safety Guarantee for Construction Services)</p>
             </div>
+
+            <div class="header-section">
+                <img src="walkotmedan.jpg" alt="Walikota Medan" class="header-person">
+            </div>
+
         </header>
         
         <div class="top-bar">
@@ -946,3 +952,4 @@ async function getSheetInfo() {
     </script>
 </body>
 </html>
+
