@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Potensi Jakon</title>
+    <title>Dashboard potensi medan kota</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -161,7 +161,7 @@
 
         .summary-cards {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -245,7 +245,8 @@
         
         .data-table-container {
             height: calc(100vh - 140px);
-            overflow-y: auto;
+            overflow: auto;           /* ganti dari overflow-y -> auto biar X juga ikut */
+            position: relative;
         }
 
         .data-table {
@@ -255,6 +256,7 @@
             margin-top: 20px;
             border-radius: var(--border-radius);
             overflow: hidden;
+            overflow: visible;
             box-shadow: var(--box-shadow);
             background: white;
         }
@@ -266,6 +268,25 @@
             border-bottom: 1px solid #edf2f7;
         }
         
+        .data-table {
+            overflow: visible;        
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 5;               
+        }
+
+        .data-table thead th {
+            position: sticky;         
+            top: 0;
+            z-index: 6;
+            background: linear-gradient(135deg, var(--color-primary), #0056b3);
+            color: var(--color-text-light);
+        }
+
+
         .data-table th.center-text,
         .data-table td.center-text {
             text-align: center;
@@ -429,8 +450,8 @@
                 <img src="pemprovsu.png" alt="Logo Pemprovsu" class="header-logo">
             </div>
             <div class="header-title">
-                <h1>DASHBOARD POTENSI JAKON</h1>
-                <p>(Occupational Safety Guarantee for Construction Services)</p>
+                <h1>DASHBOARD POTENSI MEDAN KOTA</h1>
+                <p>(Sumber data : LKPP)</p>
             </div>
 
             <div class="header-section">
@@ -454,7 +475,7 @@
         <div id="dashboard" class="dashboard">
             <div class="dashboard-main">
                 <div class="panel">
-                    <h2>Ringkasan Total Proyek</h2>
+                    <!-- <h2>Ringkasan Total Proyek</h2> -->
                     <div class="summary-cards">
                         <div class="card total-projects">
                             <h3>Total Proyek</h3>
@@ -464,20 +485,20 @@
                             <h3>Total Nilai Proyek</h3>
                             <div class="value currency" id="totalValue">Rp 0</div>
                         </div>
-                        <div class="card avg-value">
+                        <!-- <div class="card avg-value">
                             <h3>Rata-rata Nilai</h3>
                             <div class="value currency" id="avgValue">Rp 0</div>
-                        </div>
-                        <div class="card total-instansi">
+                        </div> -->
+                        <!-- <div class="card total-instansi">
                             <h3>Total Instansi</h3>
                             <div class="value" id="totalInstansi">0</div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
                 <div class="panel charts-container">
                     <div class="chart-card">
-                        <h3>Distribusi Status Potensi (Total)</h3>
+                        <h3>Status Potensi (Total)</h3>
                         <div class="chart-container">
                             <canvas id="statusChart"></canvas>
                         </div>
@@ -490,11 +511,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="dashboard-side">
                 <div class="panel data-table-container">
-                    <h2>Daftar Instansi</h2>
-                    <div style="overflow-x: auto;">
+                    <h2>Pemilik Proyek</h2>
                         <table class="data-table" id="mainDataTable">
                             <thead>
                                 <tr>
@@ -666,8 +686,8 @@ function updateSummaryCards(data) {
 
     document.getElementById('totalProjects').textContent = totalProjects.toLocaleString('id-ID');
     document.getElementById('totalValue').textContent = formatCurrency(totalValue);
-    document.getElementById('avgValue').textContent = formatCurrency(avgValue);
-    document.getElementById('totalInstansi').textContent = uniqueInstansi.toLocaleString('id-ID');
+    // document.getElementById('avgValue').textContent = formatCurrency(avgValue);
+    // document.getElementById('totalInstansi').textContent = uniqueInstansi.toLocaleString('id-ID');
 }
 
 function updateCharts(data) {
@@ -692,9 +712,15 @@ function updateStatusChart(data) {
         'lkpp': '#ffc107'
     };
     
+    const rawLabels = Object.keys(statusCounts);
     const labels = Object.keys(statusCounts);
     const values = Object.values(statusCounts);
     const colors = labels.map(label => colorMap[label.toLowerCase()] || '#6c757d');
+
+    const displayLabels = rawLabels.map(l =>
+    l.trim().toLowerCase() === 'terdaftar' ? 'Peserta' : l
+    );
+
 
     if (statusChart) { 
         statusChart.destroy(); 
@@ -704,7 +730,7 @@ function updateStatusChart(data) {
     statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: labels,
+            labels: displayLabels,
             datasets: [{
                 data: values,
                 backgroundColor: colors,
@@ -726,7 +752,7 @@ function updateStatusChart(data) {
                 },
                 tooltip: { 
                     callbacks: { 
-                        label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toLocaleString('id-ID')} proyek` 
+                        label: (ctx) => `${ctx.label}: ${ctx.raw.toLocaleString('id-ID')} proyek` 
                     } 
                 }
             }
@@ -738,59 +764,51 @@ function updateSumberDanaChart(data) {
     const sumberDanaValues = {};
     data.forEach(project => {
         const sumber = project.sumberDana || 'Tidak Diketahui';
-        sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + project.nilaiProyek;
+        const nilai = Number(project.nilaiProyek) || 0;
+        sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + nilai;
     });
 
     const labels = Object.keys(sumberDanaValues);
     const values = Object.values(sumberDanaValues);
-    const colors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
 
-    if (sumberDanaChart) { 
-        sumberDanaChart.destroy(); 
+    // Palet warna (akan diulang kalau kategori > warna)
+    const baseColors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
+    const colors = labels.map((_, i) => baseColors[i % baseColors.length]);
+
+    if (sumberDanaChart) {
+        sumberDanaChart.destroy();
     }
 
     const ctx = document.getElementById('sumberDanaChart').getContext('2d');
     sumberDanaChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
-            labels: labels,
+            labels,
             datasets: [{
-                label: 'Total Nilai Proyek',
+                label: 'Total Nilai Iuran',
                 data: values,
                 backgroundColor: colors,
-                borderColor: colors,
+                borderColor: '#ffffff',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y',
             plugins: {
-                legend: { display: false },
-                tooltip: { 
-                    callbacks: { 
-                        label: (tooltipItem) => `${formatCurrency(tooltipItem.raw)}` 
-                    } 
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    ticks: { 
-                        callback: (value) => formatCurrency(value), 
-                        color: 'var(--color-text-dark)' 
-                    },
-                    grid: { color: '#e0e0e0' }
-                },
-                y: {
-                    ticks: { 
-                        color: 'var(--color-text-dark)',
-                        font: { size: 11 }
-                    },
-                    grid: { color: '#e0e0e0' }
+                legend: { display: true, position: 'right', labels: { color: 'var(--color-text-dark)' } },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const value = Number(ctx.raw) || 0;
+                            const total = ctx.dataset.data.reduce((a, b) => a + Number(b || 0), 0);
+                            const pct = total ? (value / total * 100) : 0;
+                            return `${ctx.label}: ${formatCurrency(value)} (${pct.toFixed(1)}%)`;
+                        }
+                    }
                 }
             }
+            // Tidak perlu scales untuk pie chart
         }
     });
 }

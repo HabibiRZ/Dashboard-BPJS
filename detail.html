@@ -77,6 +77,7 @@
         .panel {
             background-color: var(--color-surface);
             padding: 30px;
+            height: 360px;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             margin-bottom: 25px;
@@ -143,6 +144,58 @@
         .chart-container {
             height: 300px;
         }
+
+        .table-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        margin: 10px 0 12px;
+        flex-wrap: wrap;
+        }
+
+        .search-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--color-surface);
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 8px 12px;
+        box-shadow: var(--box-shadow);
+        width: clamp(240px, 50vw, 520px);
+        font-weight: 600;
+        }
+
+        .search-input input {
+        border: none;
+        outline: none;
+        width: 100%;
+        font: inherit;
+        color: var(--color-text-dark);
+        }
+
+        .actions-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        }
+
+        .apply-filter {
+        font-size: .9rem;
+        color: #444;
+        user-select: none;
+        }
+
+        .rows-count {
+        font-size: .9rem;
+        color: #666;
+        background: #f3f6fb;
+        border: 1px solid #e5ecf6;
+        padding: 6px 10px;
+        border-radius: 8px;
+        }
+
         
         .data-table-container {
             flex: 1;
@@ -268,9 +321,37 @@
             flex-direction: column;
         }
 
-        .data-table-container .table-wrapper {
-            flex: 1;
-            overflow: auto;
+        .table-wrapper {
+            max-height: calc(100vh - 220px); 
+            overflow: auto;                   
+            position: relative;
+        }
+
+        .data-table {
+            overflow: visible;                
+            border-collapse: separate;
+        }
+
+        .data-table thead th {
+            position: sticky;
+            top: 0;                           
+            z-index: 2;                       
+            background: linear-gradient(135deg, var(--color-primary), #0056b3);
+            color: var(--color-text-light);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+        }
+
+        .data-table th.col-no,
+        .data-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;                      
+            background: #7c76764d;                 
+        }
+
+        
+        .data-table thead th.col-no {
+            z-index: 3;
         }
 
         .charts-row {
@@ -337,7 +418,7 @@
             <div class="dashboard-top">
                 <div class="summary-section">
                     <div class="panel">
-                        <h2>Ringkasan Proyek</h2>
+                        <!-- <h2>Ringkasan Proyek</h2> -->
                         <div class="summary-cards">
                             <div class="card total-projects">
                                 <h3>Total Proyek</h3>
@@ -348,7 +429,7 @@
                                 <div class="value currency" id="totalValue">Rp 0</div>
                             </div>
                             <div class="card avg-value">
-                                <h3>Rata-rata Nilai</h3>
+                                <h3>Potensi Iuran</h3>
                                 <div class="value currency" id="avgValue">Rp 0</div>
                             </div>
                         </div>
@@ -358,7 +439,7 @@
                 <div class="charts-section">
                     <div class="charts-row">
                         <div class="chart-panel">
-                            <h3>Distribusi Status Potensi</h3>
+                            <h3>Status Potensi</h3>
                             <div class="chart-container">
                                 <canvas id="statusChart"></canvas>
                             </div>
@@ -376,8 +457,23 @@
 
             <div class="panel data-table-container">
                 <h2>Data Proyek</h2>
+                <div class="table-actions">
+                <div class="search-input">
+                    🔎
+                    <input id="tableSearch" type="text"
+                    placeholder="Cari: nama proyek, Kode RUP/Tender/Proyek, pelaksana, sumber dana, status..." />
+                </div>
+
+                <div class="actions-right">
+                    <label class="apply-filter">
+                    <input type="checkbox" id="applyToCharts" />
+                    Terapkan filter ke ringkasan & grafik
+                    </label>
+                    <span id="rowsCount" class="rows-count">Menampilkan 0 dari 0</span>
+                </div>
+                </div>
+
                 <div class="table-wrapper">
-                    <div style="overflow-x: auto;">
                         <table class="data-table" id="dataTable">
                             <thead>
                                 <tr>
@@ -402,6 +498,8 @@
     </div>
 
     <script>
+        let originalDetailData = [];
+        let searchInitialized = false;
         let statusChart = null;
         let sumberDanaChart = null;
         let currentInstansi = null;
@@ -619,10 +717,74 @@ function formatCurrency(amount) {
 }
 
 function updateDetailDashboard(data) {
-    updateSummaryCards(data);
-    updateCharts(data);
-    updateDetailTable(data);
+  originalDetailData = data.slice();          
+  updateSummaryCards(data);
+  updateCharts(data);
+  updateDetailTable(data);
+  setupTableSearch();                          
 }
+
+function setupTableSearch() {
+  const input = document.getElementById('tableSearch');
+  const applyBox = document.getElementById('applyToCharts');
+  const rowsCount = document.getElementById('rowsCount');
+
+  if (!input || searchInitialized) {
+    // sudah siap atau belum ada input
+    updateRowsCount(originalDetailData.length, originalDetailData.length);
+    return;
+  }
+  searchInitialized = true;
+
+  const runFilter = () => {
+    const q = (input.value || '').trim().toLowerCase();
+    let filtered = originalDetailData;
+
+    if (q) {
+      const tokens = q.split(/\s+/);
+      filtered = originalDetailData.filter(p => {
+        const haystack =
+          [
+            p.kodeRup, p.kodeTender, p.kodeProyek,
+            p.namaProyek, p.namaPelaksana,
+            p.sumberDana, p.statusPotensi
+          ].join(' ').toLowerCase();
+        return tokens.every(t => haystack.includes(t));
+      });
+    }
+
+    updateDetailTable(filtered);
+    updateRowsCount(filtered.length, originalDetailData.length);
+
+    // Opsional: sinkronkan ringkasan & grafik jika dicentang
+    if (applyBox?.checked) {
+      updateSummaryCards(filtered);
+      updateCharts(filtered);
+    }
+  };
+
+  input.addEventListener('input', debounce(runFilter, 200));
+  applyBox?.addEventListener('change', runFilter);
+
+  // render awal
+  runFilter();
+}
+
+function updateRowsCount(showing, total) {
+  const el = document.getElementById('rowsCount');
+  if (el) el.textContent = `Menampilkan ${showing.toLocaleString('id-ID')} dari ${total.toLocaleString('id-ID')}`;
+}
+
+// debounce kecil biar enteng saat ketik
+function debounce(fn, delay = 300) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(null, args), delay);
+  };
+}
+
+
 
 function updateSummaryCards(data) {
     const totalProjects = data.length;
@@ -725,7 +887,7 @@ function updateSumberDanaChart(data) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Nilai Proyek',
+                label: 'Potensi Iuran',
                 data: values,
                 backgroundColor: colors,
                 borderColor: colors,
@@ -771,6 +933,15 @@ function updateDetailTable(data) {
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = '';
     
+     if (!data.length) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="8" style="text-align:center; color:#666; padding:18px;">
+      Tidak ada data yang cocok dengan pencarian.
+    </td>`;
+    tableBody.appendChild(row);
+    return;
+        }
+
     console.log(`📋 Building table with ${data.length} rows`);
     console.log(data)
     data.forEach((project, index) => {
