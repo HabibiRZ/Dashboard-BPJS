@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard potensi medan kota(Baru)</title>
+        <title>Dashboard potensi medan kota</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
         <style>
@@ -544,7 +544,7 @@
 
     // Configuration for Google Sheets API
     const SHEET_CONFIG = {
-        sheetId: "1lC89S6QlNALlqLHhaYYmIm1qPgd_-24n6ZUwUsPve5o",
+        sheetId: "1h9NVeC4Gca7IwQkuLd3kNSqaO4xLbgCBIMQK7I26HGs",
         apiKey: "AIzaSyDDChj-Syqytv2HboLnbflQu7-u_5VAYIE",
         range: "A2:M1000" // Adjust range as needed
     };
@@ -654,24 +654,14 @@
 
     function cleanCurrencyValue(value) {
         if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-        // Handle format singkatan (misal: "44.487" berarti 44.487.000.000)
-        if (value.includes('.') && !value.includes(',')) {
-            const parts = value.split('.');
-            // Jika hanya ada 1 titik, kemungkinan ini format singkatan (ribuan juta)
-            if (parts.length === 2) {
-                const angka = parseFloat(value.replace(/\./g, ''));
-                return angka * 1000000; // Kalikan dengan 1 juta
-            }
+        if (typeof value === 'string') {
+            // Remove all non-numeric characters except dots and minus signs
+            const cleaned = value.replace(/[^\d.-]/g, '');
+            const parsed = parseFloat(cleaned) || 0;
+            return parsed;
         }
-        
-        // Format normal, hapus karakter non-numeric
-        const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
-        const parsed = parseFloat(cleaned) || 0;
-        return parsed;
+        return 0;
     }
-    return 0;
-}
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('id-ID', {
@@ -819,95 +809,57 @@
 
 
     function updateSumberDanaChart(data) {
-       const sumberDanaValues = {};
-    data.forEach(project => {
-        const sumber = project.sumberDana || 'Tidak Diketahui';
-        const nilai = Number(project.nilaiProyek) || 0;
-        sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + nilai;
-    });
+        const sumberDanaValues = {};
+        data.forEach(project => {
+            const sumber = project.sumberDana || 'Tidak Diketahui';
+            const nilai = Number(project.nilaiProyek) || 0;
+            sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + nilai;
+        });
 
-    // Prioritas urutan berdasarkan gambar referensi: APBD1, APBN, APBD2
-    const orderedLabels = [];
-    const orderedValues = [];
-    
-    // Cari dan tambahkan APBD1, APBN, APBD2 secara berurutan
-    const prioritySources = ['APBD1', 'APBN', 'APBD2'];
-    
-    prioritySources.forEach(source => {
-        const matchedKey = Object.keys(sumberDanaValues).find(
-            key => key.trim().toUpperCase() === source
-        );
-        if (matchedKey) {
-            orderedLabels.push(matchedKey);
-            orderedValues.push(sumberDanaValues[matchedKey]);
+        const labels = Object.keys(sumberDanaValues);
+        const values = Object.values(sumberDanaValues);
+
+        // Palet warna (akan diulang kalau kategori > warna)
+        const baseColors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
+        const colors = labels.map((_, i) => baseColors[i % baseColors.length]);
+
+        if (sumberDanaChart) {
+            sumberDanaChart.destroy();
         }
-    });
-    
-    // Tambahkan sumber dana lainnya
-    Object.keys(sumberDanaValues).forEach(key => {
-        if (!prioritySources.includes(key.trim().toUpperCase())) {
-            orderedLabels.push(key);
-            orderedValues.push(sumberDanaValues[key]);
-        }
-    });
 
-    // Warna sesuai gambar referensi
-    const colors = orderedLabels.map(label => {
-        const cleanLabel = label.trim().toUpperCase();
-        
-        if (cleanLabel === 'APBD1') return '#004c99'; // Biru tua untuk APBD1
-        if (cleanLabel === 'APBN') return '#0066cc';  // Biru muda untuk APBN
-        if (cleanLabel === 'APBD2') return '#ffcc00'; // Kuning untuk APBD2
-        
-        // Untuk label lainnya, gunakan warna dari palet
-        const otherColors = ['#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
-        return otherColors[orderedLabels.indexOf(label) % otherColors.length];
-    });
-
-    if (sumberDanaChart) {
-        sumberDanaChart.destroy();
-    }
-
-    const ctx = document.getElementById('sumberDanaChart').getContext('2d');
-    sumberDanaChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: orderedLabels,
-            datasets: [{
-                label: 'Total Nilai Iuran',
-                data: orderedValues,
-                backgroundColor: colors,
-                borderColor: '#ffffff',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    display: true, 
-                    position: 'right', 
-                    labels: { 
-                        color: 'var(--color-text-dark)',
-                        usePointStyle: true,
-                        padding: 20
-                    } 
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => {
-                            const value = Number(ctx.raw) || 0;
-                            const total = ctx.dataset.data.reduce((a, b) => a + Number(b || 0), 0);
-                            const pct = total ? (value / total * 100) : 0;
-                            return `${ctx.label}: ${formatCurrency(value)} (${pct.toFixed(1)}%)`;
+        const ctx = document.getElementById('sumberDanaChart').getContext('2d');
+        sumberDanaChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Total Nilai Iuran',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'right', labels: { color: 'var(--color-text-dark)' } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const value = Number(ctx.raw) || 0;
+                                const total = ctx.dataset.data.reduce((a, b) => a + Number(b || 0), 0);
+                                const pct = total ? (value / total * 100) : 0;
+                                return `${ctx.label}: ${formatCurrency(value)} (${pct.toFixed(1)}%)`;
+                            }
                         }
                     }
                 }
+                // Tidak perlu scales untuk pie chart
             }
-        }
-    });
-}
+        });
+    }
 
     function updateMainTable(data) {
         const instansiCounts = {};
@@ -1070,4 +1022,3 @@
         </script>
     </body>
     </html>
-
