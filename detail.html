@@ -77,10 +77,86 @@
         .panel {
             background-color: var(--color-surface);
             padding: 30px;
-            height: 360px;
+            min-height: 360px;
+            height: auto;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             margin-bottom: 25px;
+        }
+
+
+        .panel.data-table-container .table-wrapper {
+            flex: 1;             
+            max-height: none;    
+            overflow: auto;     
+        }
+
+        .panel.data-table-container {
+        height: calc(100vh - 160px) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        }
+
+        /* === OVERRIDE: biar panel tabel ngikutin isi === */
+
+        /* 1) Jangan kunci tinggi container utama */
+        .dashboard-container {
+        height: auto !important;
+        }
+
+        /* 2) Panel tabel fleksibel setinggi kontennya */
+        .panel.data-table-container {
+        height: auto !important;
+        max-height: none !important;
+        display: block !important;   /* tak perlu flex kalau cuma isi konten */
+        }
+
+        /* 3) Wrapper tabel jangan dibatasi & jangan bikin scroll sendiri */
+        .panel.data-table-container .table-wrapper {
+        max-height: none !important;
+        overflow: visible !important;
+        }
+
+        /* 4) Pastikan tidak ada parent yang menyembunyikan overflow */
+        .data-table-container {
+        overflow: visible !important;
+        }
+
+        /* (opsional) Header tabel tetap lengket di bagian atas saat page di-scroll */
+        .data-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 6;
+        }
+
+
+    
+
+        /* Area yang berisi <table> mengisi sisa tinggi panel dan boleh scroll */
+        .panel.data-table-container .table-wrapper {
+        flex: 1 !important;
+        max-height: none !important;   /* jangan batasi lagi */
+        min-height: 380px !important;  /* kira-kira 6 baris + thead */
+        overflow: auto !important;      /* biar scroll di sini */
+        }
+
+        /* Pastikan tidak ada parent yang menyembunyikan overflow */
+        .data-table-container {
+        overflow: visible !important;
+        }
+
+        /* (Opsional) Stabilkan tinggi baris supaya 6+ baris pasti muat */
+        .data-table tbody tr { 
+        line-height: 1.2;
+        }
+        .data-table td { 
+        padding-top: 10px; 
+        padding-bottom: 10px; 
+        }
+
+
+        .data-table-container {
+            overflow: visible;   
         }
 
         .summary-cards {
@@ -148,7 +224,7 @@
         .status-lkpp { background-color: var(--color-yellow-accent); color:#333; }
 
         .table-actions {
-        display: flex;
+        display: flex;  
         gap: 12px;
         justify-content: space-between;
         align-items: center;
@@ -332,8 +408,8 @@
         }
 
         .table-wrapper {
-            max-height: calc(100vh - 220px); 
-            overflow: auto;                   
+            /* max-height: calc(100vh - 220px); 
+            overflow: auto;                    */
             position: relative;
         }
 
@@ -841,64 +917,89 @@ function updateCharts(data) {
 }
 
 function updateStatusChart(data) {
-    const statusCounts = {};
-    console.log(data)
-    data.forEach(project => {
-        const status = project.statusPotensi;
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-    });
-    
-    const colorMap = {
-        'valid': '#28a745',
-        'belum tl': '#dc3545',
-        'terdaftar': '#0066cc',
-        'tidak diketahui': '#6c757d',
-        'lkpp': '#ffc107'
-    };
-    
-    const labels = Object.keys(statusCounts);
-    const values = Object.values(statusCounts);
-    const colors = labels.map(label => colorMap[label.toLowerCase()] || '#6c757d');
+  // Hitung count & total potensi iuran per status
+  const statusCounts = {};
+  const statusPotensi = {};
 
-    if (statusChart) { 
-        statusChart.destroy(); 
-    }
+  data.forEach(project => {
+    const status = (project.statusPotensi || 'Tidak Diketahui');
+    const nilai = Number(project.nilaiProyek) || 0;
+    const pot = computePotensiIuran(nilai); // Σ potensi iuran PER BARIS
 
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    statusChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: 'var(--color-surface)'
-            }]
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+    statusPotensi[status] = (statusPotensi[status] || 0) + pot;
+  });
+
+  // Warna konsisten per status
+  const colorMap = {
+    'valid': '#28a745',
+    'belum tl': '#dc3545',
+    'terdaftar': '#0066cc',
+    'tidak diketahui': '#6c757d',
+    'lkpp': '#ffc107'
+  };
+
+  // Label mentah (sesuai data) & label tampil (rename 'terdaftar' -> 'Peserta')
+  const rawLabels = Object.keys(statusCounts);
+  const displayLabels = rawLabels.map(l =>
+    (l || '').trim().toLowerCase() === 'terdaftar' ? 'Peserta' : l
+  );
+
+  // Dataset untuk chart (pakai JUMLAH PROYEK sebagai slice value)
+  const values = rawLabels.map(l => statusCounts[l] || 0);
+  const colors = rawLabels.map(l => colorMap[(l || '').toLowerCase()] || '#6c757d');
+
+  // Susun potensi iuran berurutan sesuai irisan chart
+  const potensiValues = rawLabels.map(l => statusPotensi[l] || 0);
+  const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
+
+  if (statusChart) statusChart.destroy();
+
+  const ctx = document.getElementById('statusChart').getContext('2d');
+  statusChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: displayLabels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: 'var(--color-surface)'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: 'var(--color-text-dark)',
+            usePointStyle: true,
+            padding: 20
+          }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    position: 'bottom', 
-                    labels: { 
-                        color: 'var(--color-text-dark)',
-                        usePointStyle: true,
-                        padding: 20
-                    } 
-                },
-                tooltip: { 
-                    callbacks: { 
-                        label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toLocaleString('id-ID')} proyek` 
-                    } 
-                }
+        tooltip: {
+          callbacks: {
+            // Munculkan 2 baris: jumlah proyek & total potensi iuran (plus persen kontribusi)
+            label: function (ctx) {
+              const idx = ctx.dataIndex;
+              const count = ctx.raw;
+              const pot = potensiValues[idx] || 0;
+              const pct = totalPotensiAll ? (pot / totalPotensiAll * 100) : 0;
+
+              return [
+                `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
+                `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`
+              ];
             }
+          }
         }
-    });
-    
-    console.log(`📊 Status Chart Updated:`, statusCounts);
+      }
+    }
+  });
 }
+
 
 // function updateSumberDanaChart(data) {
 //     const sumberDanaValues = {};
