@@ -1038,7 +1038,7 @@ function updateStatusChart(data) {
 
   const ctx = document.getElementById('statusChart').getContext('2d');
   statusChart = new Chart(ctx, {
-    type: 'doughnut',
+    type: 'bar',
     data: {
       labels: displayLabels,
       datasets: [{
