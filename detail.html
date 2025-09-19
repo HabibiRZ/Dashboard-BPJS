@@ -568,6 +568,96 @@
                 flex-direction: column;
             }
         }
+
+        @media (min-width: 901px) {
+        /* Panel utama menempel, halaman tidak ikut scroll */
+        body { overflow-y: hidden !important; }
+        .container {
+            position: sticky !important;
+            top: 10px !important;
+            max-height: calc(100vh - 20px) !important;
+            overflow: hidden !important;
+        }
+
+        /* Bagian atas tetap terlihat */
+        .dashboard-container {
+            height: calc(100vh - 200px) !important; /* sesuaikan jika header berbeda tinggi */
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+        }
+
+        /* Panel tabel: hanya area tabel yang scroll */
+        .panel.data-table-container {
+            display: flex !important;
+            flex-direction: column !important;
+            max-height: calc(100vh - 260px) !important; /* ruang untuk summary+chart */
+            overflow: hidden !important;
+        }
+        .panel.data-table-container .table-wrapper {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow: auto !important;           /* <- scroll di sini */
+            max-height: none !important;
+        }
+
+        /* Header tabel tetap nempel saat isi tabel di-scroll */
+        .panel.data-table-container thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 6 !important;
+        }
+        }
+
+        /* ================== HP (≤900px) ================== */
+        @media (max-width: 900px) {
+        /* Matikan sticky: halaman bisa scroll normal */
+        body { overflow-y: auto !important; }
+        .container {
+            position: static !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .dashboard-container {
+            height: auto !important;
+            overflow: visible !important;
+        }
+
+        /* Tabel tetap punya scroll sendiri agar nyaman dibaca */
+        .panel.data-table-container {
+            display: block !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .panel.data-table-container .table-wrapper {
+            max-height: 60vh !important;         /* ketinggian area scroll tabel di HP */
+            overflow: auto !important;
+        }
+
+        /* Header tabel tetap sticky di dalam area tabel */
+        .panel.data-table-container thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 6 !important;
+        }
+
+        /* Susunan atas jadi menumpuk */
+        .dashboard-top {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+        .summary-cards {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+        }
+        @media (max-width: 520px) {
+            .summary-cards { grid-template-columns: 1fr !important; }
+        }
+        .charts-section .chart-container { height: 180px !important; }
+        }
     </style>
 </head>
 <body>

@@ -60,7 +60,7 @@
             }
 
             .header-logo {
-                height: 60px;
+                height: 40px;
                 margin-right: 15px;
                 border-radius: 8px;
             }
@@ -75,14 +75,14 @@
             }
             
             .header-title h1 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
                 color: var(--color-primary);
                 font-weight: 700;
                 margin-bottom: 5px;
             }
             
             .header-title p {
-                font-size: 0.9rem;
+                font-size: 0.7rem;
                 color: #666;
                 font-style: italic;
             }
@@ -615,105 +615,146 @@
             color: var(--color-text-light);
             }
 
-            @media (max-width: 900px){
-                .dashboard-top {
+            .header-bar{
+                width: 100px;
+            }
+            /* ================== DESKTOP BESAR (≥1201px) ================== */
+            @media (min-width: 1201px) {
+            /* panel utama nempel (sticky) dan kelihatan penuh */
+            .container {
+                position: sticky;
+                top: 10px;
+                max-height: calc(100vh - 20px);
+                overflow: hidden;
+                padding: 16px 20px;
+            }
+
+            /* summary kiri (360px), charts kanan melebar */
+            .dashboard-top {
+                display: grid;
+                grid-template-columns: 360px 1fr;
+                gap: 18px;
+                align-items: start;
+            }
+
+            /* charts dua kolom */
+            .dashboard-top .charts-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(320px, 1fr));
+                gap: 16px;
+            }
+
+            /* tabel scroll di dalam panel, seluruh layout tetap terlihat */
+            .dashboard-bottom .data-table-container {
+                max-height: 350px;
+                overflow: auto;
+            }
+            }
+
+            /* ================== TABLET (901px – 1200px) ================== */
+            @media (min-width: 901px) and (max-width: 1200px) {
+            .container {
+                position: sticky;
+                top: 8px;
+                max-height: calc(100vh - 16px);
+                overflow: hidden;
+                padding: 12px 16px;
+            }
+
+            .dashboard-top {
+                display: grid;
+                grid-template-columns: 320px 1fr; /* sedikit lebih sempit dari desktop */
+                gap: 16px;
+                align-items: start;
+            }
+
+            .dashboard-top .charts-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(280px, 1fr));
+                gap: 14px;
+            }
+
+            .chart-container { height: 210px; }
+
+            .dashboard-bottom .data-table-container {
+                max-height: 320px;
+                overflow: auto;
+            }
+            }
+
+            /* ================== HP (≤900px) ================== */
+            @media (max-width: 900px) {
+            /* BUKAN sticky: halaman bisa di-scroll normal */
+            .container {
+                position: static;
+                max-height: none;
+                overflow: visible;
+                padding: 10px;
+            }
+
+            .header-section { justify-content: center; } 
+            .header-bar { height: clamp(12px, 8vw, 40px); }
+
+            /* tumpuk: summary → charts → tabel */
+            .dashboard-top {
                 display: flex;
                 flex-direction: column;
-                gap: 20px;
+                gap: 12px;
             }
+
+            /* summary cards jadi grid 2 kolom (atau 1 kolom kalau sempit) */
             .summary-cards {
-                flex-direction: row;
-                flex-wrap: wrap;
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
-                max-width: 100%;
+                width: 100%;
+            }
+            @media (max-width: 520px) {
+                .summary-cards { grid-template-columns: 1fr; }
             }
             .summary-cards .card {
-                flex: 1 1 calc(50% - 10px);
+                width: 100% !important;
+                padding: 14px 16px;
+                text-align: left;
+                align-items: flex-start;
             }
-                .dashboard-top {
-                grid-template-columns: 1fr; 
+            .summary-cards .card h3 { font-size: 0.95rem; }
+            .summary-cards .card .value { font-size: 1.6rem; }
+
+            /* charts satu kolom penuh */
+            .dashboard-top .charts-container {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
             }
-                .dashboard-top .charts-container {
-                 grid-template-columns: 1fr; 
-            }
-                .dashboard-main{ width:100%; }
-                .dashboard-main > .panel.charts-container{ width:100% !important; }
-                .dashboard-main .charts-container{ grid-template-columns: 1fr !important; }
+            .chart-card { padding: 12px; }
+            .chart-container { height: 180px; }
+
+            /* tabel tetap scroll di dalam, tinggi pakai porsi layar */
+            .dashboard-bottom .data-table-container {
+                max-height: 60vh;   /* tabel punya scroll sendiri */
+                overflow: auto;
+                border: 1px solid #edf2f7;
+                border-radius: var(--border-radius);
             }
 
-            @media (min-width: 992px) {
-                .dashboard-main > .panel.charts-container{
-                    grid-template-columns: 1fr !important;
-                }
-                .charts-container {
-                    grid-template-columns: 1fr 1fr;
-                }
+            /* judul & header tabel tetap sticky di dalam panel tabel */
+            .dashboard-bottom .data-table-container { --sticky-title-h: 44px; }
+            .dashboard-bottom .data-table-container > h2 {
+                position: sticky; top: 0; z-index: 20;
+                background: var(--color-surface);
+                margin: 0; padding: 8px 10px; border-bottom: 1px solid #edf2f7;
             }
-            
-            @media (max-width: 1200px) {
-                .dashboard {
-                    flex-direction: column;
-                    grid-template-columns: 1fr;   
-                    row-gap: 15px;
-                }
-                .dashboard-side {
-                    max-width: none;
-                }
-                .data-table-container {
-                    height: 400px;
-                }
-                .dashboard-main,
-                .dashboard-main > .panel:first-child,
-                .dashboard-main > .panel.charts-container{
-                    width: 100%;
-                }
-                .dashboard-side{
-                    min-width: 0;
-                }
+            .dashboard-bottom .data-table-container thead th {
+                position: sticky; top: var(--sticky-title-h); z-index: 15;
+                background: linear-gradient(135deg, var(--color-primary), #0056b3);
+                color: var(--color-text-light);
             }
 
-            @media (max-width: 768px) {
-                .dashboard-main {
-                    width: 100%;
-                }
-                .dashboard-main > .panel:first-child{
-                    width:100%}
-                .header-title {
-                    display: none;
-                }
-                header {
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    gap: 10px;
-                }
-                .header-section {
-                    justify-content: center;
-                    width: 100%;
-                }
-                .header-logo, .header-person {
-                    height: 60px;
-                    margin: 0 5px;
-                }
-                h1 {
-                    font-size: 1.8rem;
-                }
-                .summary-cards {
-                    grid-template-columns: 1fr;
-                }
-                .charts-container {
-                    grid-template-columns: 1fr;
-                }
-                .chart-container {
-                    height: 200px;
-                }
-                .top-bar {
-                    flex-direction: column;
-                    gap: 10px;
-                    text-align: center;
-                }
+            /* header/top-bar lebih kompak */
+            header { padding: 8px 10px; gap: 8px; }
+            .header-title { display: none; }
+            .top-bar { flex-direction: column; gap: 6px; padding: 6px 10px; }
             }
-
-                
 
             
             @keyframes spin {
