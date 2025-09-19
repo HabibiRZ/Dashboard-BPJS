@@ -20,6 +20,7 @@
             --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --border-radius: 12px;
             --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --summary-col-width: clamp(260px, 22vw, 340px);
         }
 
         * {
@@ -46,15 +47,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
+            padding: 10px 0;
+            margin-bottom: 10px;
             background-color: var(--color-surface);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
 
         header img {
-            height: 80px;
+            height: 50px;
             margin-right: 15px;
         }
         
@@ -76,12 +77,12 @@
 
         .panel {
             background-color: var(--color-surface);
-            padding: 30px;
+            padding: 10px;
             min-height: 360px;
             height: auto;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
 
@@ -97,57 +98,45 @@
         flex-direction: column !important;
         }
 
-        /* === OVERRIDE: biar panel tabel ngikutin isi === */
-
-        /* 1) Jangan kunci tinggi container utama */
+        
         .dashboard-container {
         height: auto !important;
         }
 
-        /* 2) Panel tabel fleksibel setinggi kontennya */
         .panel.data-table-container {
         height: auto !important;
         max-height: none !important;
-        display: block !important;   /* tak perlu flex kalau cuma isi konten */
+        display: block !important;   
         }
-
-        /* 3) Wrapper tabel jangan dibatasi & jangan bikin scroll sendiri */
         .panel.data-table-container .table-wrapper {
         max-height: none !important;
         overflow: visible !important;
         }
 
-        /* 4) Pastikan tidak ada parent yang menyembunyikan overflow */
+        
         .data-table-container {
         overflow: visible !important;
         }
 
-        /* (opsional) Header tabel tetap lengket di bagian atas saat page di-scroll */
         .data-table thead th {
         position: sticky;
         top: 0;
         z-index: 6;
         }
 
-
-    
-
-        /* Area yang berisi <table> mengisi sisa tinggi panel dan boleh scroll */
         .panel.data-table-container .table-wrapper {
         flex: 1 !important;
-        max-height: none !important;   /* jangan batasi lagi */
-        min-height: 380px !important;  /* kira-kira 6 baris + thead */
-        overflow: auto !important;      /* biar scroll di sini */
+        max-height: none !important;   
+        min-height: 380px !important; 
+        overflow: auto !important;      
         }
 
-        /* Pastikan tidak ada parent yang menyembunyikan overflow */
         .data-table-container {
         overflow: visible !important;
         }
 
-        /* (Opsional) Stabilkan tinggi baris supaya 6+ baris pasti muat */
         .data-table tbody tr { 
-        line-height: 1.2;
+        line-height: 1;
         }
         .data-table td { 
         padding-top: 10px; 
@@ -228,14 +217,14 @@
         gap: 12px;
         justify-content: space-between;
         align-items: center;
-        margin: 10px 0 12px;
+        margin: 5px 0 6px;
         flex-wrap: wrap;
         }
 
         .search-input {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 5px;
         background: var(--color-surface);
         border: 1px solid #e0e0e0;
         border-radius: 10px;
@@ -383,11 +372,55 @@
         }
 
         .dashboard-top {
-            display: flex;
-            gap: 15px;
-            min-height: fit-content;
+            display: grid;
+            grid-template-columns: var(--summary-col-width) 1fr; 
+            column-gap: 15px;
+            align-items: start;
+            margin-top: 0; 
         }
 
+        .dashboard-top .panel{
+            min-height: 0;          
+            padding: 14px 16px;     
+            margin-bottom: 12px;
+        }  
+        .dashboard-top .summary-cards{
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, auto));
+            margin-bottom: 12px;
+         }
+        .dashboard-top .card{ padding: 8px 12px; }
+        .dashboard-top .card h3{ font-size: .85rem; margin-bottom: 6px; }
+        .dashboard-top .card .value{ font-size: 1.6rem; }
+        .dashboard-top .card .currency{ font-size: 1.2rem; }
+
+        .dashboard-top .charts-row{ gap: 12px; margin-bottom: 0; }
+        .dashboard-top .chart-panel{ padding: 12px; }
+        .dashboard-top .chart-panel .chart-container{ height: 200px; } 
+
+        .summary-section{ width: var(--summary-col-width); }
+        .summary-section .panel{ padding: 14px 16px; margin-bottom: 12px; }  
+        .summary-section .summary-cards{
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 12px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .summary-section .card{
+            width: 100%;
+            padding: 10px 12px;
+        }
+        .summary-section .card h3{ font-size: .9rem; margin-bottom: 6px; }
+        .summary-section .card .value{ font-size: 1.6rem; }
+        .summary-section .card .currency{ font-size: 1.2rem; }
+
+        
+        .charts-section{ display: flex; flex-direction: column; gap: 12px; }
+        .charts-section .chart-panel{ padding: 12px; }
+        .charts-section .chart-container{ height: 220px; } 
+
+        .back-button{ margin-bottom: 10px; }    
         .summary-section {
             flex: 1;
         }
@@ -454,6 +487,51 @@
             box-shadow: var(--box-shadow);
         }
 
+        .panel.data-table-container{
+            display: flex !important;
+            flex-direction: column !important;
+            max-height: calc(100vh - 220px) !important; 
+            overflow: hidden !important;                 
+            padding: 14px 16px;                          
+        } 
+        
+        .panel.data-table-container > h2{ margin-bottom: 10px; }
+        .panel.data-table-container .table-actions{
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: var(--color-surface);
+            padding: 6px 0 8px;
+        }
+
+        .panel.data-table-container .table-wrapper{
+            flex: 1 1 auto !important;
+            min-height: 0 !important;         
+            overflow: auto !important;        
+            max-height: none !important;
+        }
+
+        
+        .data-table{
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            }
+            .data-table thead th{
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: linear-gradient(135deg, var(--color-primary), #0056b3);
+            color: var(--color-text-light);
+        }
+        .data-table th.col-no,
+        .data-table td:first-child{
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: #fff;                  
+        }
+
         @media (min-width: 992px) {
             .charts-container {
                 grid-template-columns: 1fr 1fr;
@@ -461,6 +539,9 @@
         }
         
         @media (max-width: 768px) {
+            .panel.data-table-container{ max-height: calc(100vh - 280px) !important; }
+            .dashboard-top .card .value{ font-size: 1.4rem; }
+            .dashboard-top .chart-panel .chart-container{ height: 180px; }
             .summary-cards {
                 grid-template-columns: 1fr;
             }
