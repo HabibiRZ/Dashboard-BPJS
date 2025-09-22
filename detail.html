@@ -1140,16 +1140,9 @@ function updateStatusChart(data) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: 'var(--color-text-dark)',
-            usePointStyle: true,
-            padding: 20
-          }
-        },
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
         tooltip: {
           callbacks: {
             // Munculkan 2 baris: jumlah proyek & total potensi iuran (plus persen kontribusi)
