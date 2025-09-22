@@ -76,6 +76,14 @@
       padding:12px; overflow:hidden; display:flex; flex-direction:column;
     }
     .table-wrap{ overflow:auto; max-height:70vh; border:1px solid #edf2f7; border-radius:10px }
+    .table-green thead th{
+    background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    .table-green tbody tr:hover{ background:#e8f5e9; }
+    .table-red thead th{
+    background: linear-gradient(135deg, #dc3545, #e35d6a);
+    }
+    .table-red tbody tr:hover{ background:#fdecea; }
     table{ width:100%; border-collapse:collapse; min-width:780px }
     thead th{
       position:sticky; top:0; z-index:2; background:linear-gradient(135deg,var(--color-primary),#0056b3);
@@ -86,6 +94,16 @@
     tbody tr:nth-child(even){ background:#f8fafc }
     tbody tr:hover{ background:#edf2f7 }
 
+    .instansi-link{
+        color: var(--color-secondary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .instansi-link:hover{
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
     .num{ text-align:center; width:56px }
     .val, .idr{ text-align:right; white-space:nowrap }
     .sub{ font-size:.82rem; color:#666; margin-top:2px }
@@ -148,45 +166,45 @@
     <div class="grid">
       <!-- TOP 10 -->
       <section class="panel">
-        <h2>Top 10 Potensi Iuran Tertinggi <span class="badge" id="badgeTopCount">0 proyek</span></h2>
+        <h2>Top 10 Potensi Iuran Tertinggi <span class="badge" id="badgeTopCount">0 instansi</span></h2>
         <div class="table-wrap" id="topWrap">
-          <table id="topTable">
+            <table id="topTable" class="table-green">
             <thead>
-              <tr>
+                <tr>
                 <th class="num">No.</th>
-                <th>Nama Proyek</th>
                 <th>Instansi</th>
-                <th class="idr">Nilai Proyek</th>
-                <th class="idr">Potensi Iuran</th>
-              </tr>
+                <th class="num">Jml Proyek</th>
+                <th class="idr">Total Nilai Proyek</th>
+                <th class="idr">Total Potensi Iuran</th>
+                </tr>
             </thead>
             <tbody>
-              <tr><td colspan="5"><div class="loading-spinner"></div></td></tr>
+                <tr><td colspan="5"><div class="loading-spinner"></div></td></tr>
             </tbody>
-          </table>
+            </table>
         </div>
       </section>
 
       <!-- BOTTOM 10 -->
       <section class="panel">
-        <h2>Bottom 10 Potensi Iuran Terendah <span class="badge" id="badgeBottomCount">0 proyek</span></h2>
+        <h2>Bottom 10 Potensi Iuran Terendah <span class="badge" id="badgeBottomCount">0 instansi</span></h2>
         <div class="table-wrap" id="bottomWrap">
-          <table id="bottomTable">
+            <table id="bottomTable" class="table-red">
             <thead>
-              <tr>
+                <tr>
                 <th class="num">No.</th>
-                <th>Nama Proyek</th>
                 <th>Instansi</th>
-                <th class="idr">Nilai Proyek</th>
-                <th class="idr">Potensi Iuran</th>
-              </tr>
+                <th class="num">Jml Proyek</th>
+                <th class="idr">Total Nilai Proyek</th>
+                <th class="idr">Total Potensi Iuran</th>
+                </tr>
             </thead>
             <tbody>
-              <tr><td colspan="5"><div class="loading-spinner"></div></td></tr>
+                <tr><td colspan="5"><div class="loading-spinner"></div></td></tr>
             </tbody>
-          </table>
+            </table>
         </div>
-      </section>
+        </section>
     </div>
   </div>
 
@@ -279,58 +297,74 @@
       return data;
     }
 
-    function renderTable(tbodyEl, list){
-      tbodyEl.innerHTML = '';
-      list.forEach((p, i) => {
+    function renderAggTable(tbodyEl, list){
+    tbodyEl.innerHTML = '';
+    list.forEach((it, i) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="num">${i+1}</td>
-          <td>
-            <div><a href="detail.html?instansi=${encodeURIComponent(p.namaInstansi)}" class="instansi-link" style="text-decoration:none;color:var(--color-secondary);font-weight:600">${p.namaProyek}</a></div>
-            <div class="sub">Pemilik: ${p.namaPemilik || '-'}</div>
-          </td>
-          <td>${p.namaInstansi}</td>
-          <td class="idr">${formatCurrency(p.nilaiProyek)}</td>
-          <td class="idr">${formatCurrency(p.potensiIuran)}</td>
+        <td class="num">${i+1}</td>
+        <td>
+            <a class="instansi-link"
+            href="detail.html?instansi=${encodeURIComponent(it.instansi)}"
+            title="Lihat detail proyek untuk ${it.instansi}">
+            ${it.instansi}
+            </a>
+        </td>
+        <td class="num">${it.count.toLocaleString('id-ID')}</td>
+        <td class="idr">${formatCurrency(it.totalNilai)}</td>
+        <td class="idr">${formatCurrency(it.totalPotensi)}</td>
         `;
         tbodyEl.appendChild(tr);
-      });
+    });
     }
 
     async function loadAndRender(){
-      updateCurrentDate();
-      setStatus('loading','Memuat data…');
-      try{
-        const data = await fetchGoogleSheetsData();
+    updateCurrentDate();
+    setStatus('loading','Memuat data…');
+    try{
+        const rows = await fetchGoogleSheetsData();
 
-        // Urutkan berdasarkan potensi iuran
-        const sorted = [...data].sort((a,b) => b.potensiIuran - a.potensiIuran);
+        // --- Agregasi per instansi ---
+        const byInstansi = new Map();
+        rows.forEach(p => {
+        const key = p.namaInstansi || 'Tidak Diketahui';
+        const pot = p.potensiIuran || 0;
+        const nilai = p.nilaiProyek || 0;
 
-        // Ambil Top 10 & Bottom 10 (termasuk nilai 0 agar benar-benar terendah)
-        const top10 = sorted.slice(0, 10);
-        // Filter proyek bernilai valid dulu agar tidak semua 0—namun tetap jika datanya memang 0 semua akan tampil
-        const bottomSorted = [...data].sort((a,b) => a.potensiIuran - b.potensiIuran);
-        const bottom10 = bottomSorted.slice(0, 10);
+        if(!byInstansi.has(key)){
+            byInstansi.set(key, { instansi: key, count: 0, totalNilai: 0, totalPotensi: 0 });
+        }
+        const agg = byInstansi.get(key);
+        agg.count += 1;
+        agg.totalNilai += nilai;
+        agg.totalPotensi += pot;
+        });
+
+        const aggList = Array.from(byInstansi.values());
+
+        // Urutkan berdasarkan totalPotensi (DESC untuk Top, ASC untuk Bottom)
+        const top10 = [...aggList].sort((a,b) => b.totalPotensi - a.totalPotensi).slice(0,10);
+        const bottom10 = [...aggList].sort((a,b) => a.totalPotensi - b.totalPotensi).slice(0,10);
 
         // Render
-        renderTable(document.querySelector('#topTable tbody'), top10);
-        renderTable(document.querySelector('#bottomTable tbody'), bottom10);
+        renderAggTable(document.querySelector('#topTable tbody'), top10);
+        renderAggTable(document.querySelector('#bottomTable tbody'), bottom10);
 
-        // Badge jumlah
-        document.getElementById('badgeTopCount').textContent = `${top10.length} proyek`;
-        document.getElementById('badgeBottomCount').textContent = `${bottom10.length} proyek`;
+        // Badge
+        document.getElementById('badgeTopCount').textContent = `${top10.length} instansi`;
+        document.getElementById('badgeBottomCount').textContent = `${bottom10.length} instansi`;
 
-        setStatus('online', `${data.length} data berhasil dimuat`);
-      }catch(err){
+        setStatus('online', `${rows.length} baris proyek • ${aggList.length} instansi`);
+    }catch(err){
         console.error(err);
         setStatus('error','Gagal memuat data');
         showError('Gagal memuat data dari Google Sheets. Silakan coba lagi.');
-      }
     }
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
       loadAndRender();
-      document.getElementById('refreshBtn').addEventListener('click', loadAndRender);
       // Auto refresh tiap 5 menit biar konsisten dengan index.html
       setInterval(loadAndRender, 5 * 60 * 1000);
     });
