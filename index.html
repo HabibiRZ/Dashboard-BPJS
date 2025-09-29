@@ -902,7 +902,7 @@
 
 
     <script>
-        
+
     let statusChart = null;
     let sumberDanaChart = null;
 
@@ -1088,40 +1088,67 @@
     }
 
     function updateStatusChart(data) {
+    // --- Helper: normalisasi & mapping status ---
+    const normalizeMapStatus = (s) => {
+        const x = String(s ?? '')
+        .normalize('NFKC')
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, ' ');
+
+        if (
+        x === 'BELUM TL' ||
+        x === 'BELUM_TL' ||
+        x === 'BELUM-TL' ||
+        x === 'TIDAK VALID' ||
+        x === 'TIDAK_VALID'
+        ) {
+        return 'Belum Terdaftar';
+        }
+        if (x === 'VALID' || x === 'TERDAFTAR') {
+        return 'Terdaftar';
+        }
+
+        // default: pakai label asli (title case), bukan "Tidak Diketahui"
+        return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+    };
+
     // Hitung count & total potensi iuran per status
     const statusCounts = {};
     const statusPotensi = {};
 
-    data.forEach(project => {
-        const status = (project.statusPotensi || 'Tidak Diketahui');
+    data.forEach((project) => {
+        const statusFinal = normalizeMapStatus(project.statusPotensi);
         const nilai = Number(project.nilaiProyek) || 0;
-        const pot = computePotensiIuran(nilai); // Σ potensi iuran PER BARIS
+        const pot = computePotensiIuran(nilai);
 
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-        statusPotensi[status] = (statusPotensi[status] || 0) + pot;
+        statusCounts[statusFinal] = (statusCounts[statusFinal] || 0) + 1;
+        statusPotensi[statusFinal] = (statusPotensi[statusFinal] || 0) + pot;
     });
 
-    // Warna konsisten per status
+    // Warna konsisten per status final
     const colorMap = {
-        'valid': '#28a745',
-        'belum tl': '#dc3545',
         'terdaftar': '#0066cc',
-        'tidak diketahui': '#6c757d',
-        'lkpp': '#ffc107'
+        'belum terdaftar': '#dc3545'
+        // status lain otomatis abu
     };
 
-    // Label mentah (sesuai data) & label tampil (rename 'terdaftar' -> 'Peserta')
+    // Ambil semua label dari hasil hitung
     const rawLabels = Object.keys(statusCounts);
-    const displayLabels = rawLabels.map(l =>
-        (l || '').trim().toLowerCase() === 'terdaftar' ? 'Peserta' : l
+
+    // Rename kalau mau tampilkan 'Peserta'
+    const displayLabels = rawLabels.map((l) =>
+        l === 'Terdaftar' ? 'Terdaftar' : l
     );
 
-    // Dataset untuk chart (pakai JUMLAH PROYEK sebagai slice value)
-    const values = rawLabels.map(l => statusCounts[l] || 0);
-    const colors = rawLabels.map(l => colorMap[(l || '').toLowerCase()] || '#6c757d');
+    // Dataset: jumlah proyek per status
+    const values = rawLabels.map((l) => statusCounts[l] || 0);
+    const colors = rawLabels.map(
+        (l) => colorMap[l.toLowerCase()] || '#6c757d'
+    );
 
-    // Susun potensi iuran berurutan sesuai irisan chart
-    const potensiValues = rawLabels.map(l => statusPotensi[l] || 0);
+    // Potensi iuran
+    const potensiValues = rawLabels.map((l) => statusPotensi[l] || 0);
     const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
 
     if (statusChart) statusChart.destroy();
@@ -1131,36 +1158,37 @@
         type: 'bar',
         data: {
         labels: displayLabels,
-        datasets: [{
+        datasets: [
+            {
             data: values,
             backgroundColor: colors,
             borderWidth: 2,
-            borderColor: 'var(--color-surface)'
-        }]
+            borderColor: 'var(--color-surface)',
+            },
+        ],
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
             legend: { display: false },
             tooltip: {
             callbacks: {
-                // Munculkan 2 baris: jumlah proyek & total potensi iuran (plus persen kontribusi)
                 label: function (ctx) {
                 const idx = ctx.dataIndex;
                 const count = ctx.raw;
                 const pot = potensiValues[idx] || 0;
-                const pct = totalPotensiAll ? (pot / totalPotensiAll * 100) : 0;
+                const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
 
                 return [
                     `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
-                    `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`
+                    `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`,
                 ];
-                }
-            }
-            }
-        }
-        }
+                },
+            },
+            },
+        },
+        },
     });
     }
 
@@ -1260,6 +1288,7 @@
             minute: '2-digit',
             timeZone: 'Asia/Jakarta'
         };
+        
         document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
     }
 
