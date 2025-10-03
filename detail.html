@@ -1086,7 +1086,6 @@ function updateSummaryCards(data) {
   console.log(`📊 Summary Updated | Proyek:${totalProjects} | Nilai:${formatCurrency(totalValue)} | Potensi:${formatCurrency(potensi)}`);
 }
 
-// === Helper global: normalisasi & mapping status ===
 function normalizeMapStatus(s) {
   const x = String(s ?? '')
     .normalize('NFKC')
@@ -1096,14 +1095,12 @@ function normalizeMapStatus(s) {
 
   if (
     x === 'BELUM TL' ||
-    x === 'BELUM_TL' ||
-    x === 'BELUM-TL' ||
-    x === 'TIDAK VALID' ||
+    x === 'VALID' ||
     x === 'TIDAK_VALID'
   ) {
     return 'Belum Terdaftar';
   }
-  if (x === 'VALID' || x === 'TERDAFTAR') {
+  if (x === 'TERDAFTAR') {
     return 'Terdaftar';
   }
 
@@ -1128,14 +1125,12 @@ const normalizeMapStatus = (s) => {
 
   if (
     x === 'BELUM TL' ||
-    x === 'BELUM_TL' ||
-    x === 'BELUM-TL' ||
-    x === 'TIDAK VALID' ||
+    x === 'VALID' ||
     x === 'TIDAK_VALID'
   ) {
     return 'Belum Terdaftar';
   }
-  if (x === 'VALID' || x === 'TERDAFTAR') {
+  if (x === 'TERDAFTAR') {
     return 'Terdaftar';
   }
 
@@ -1303,16 +1298,13 @@ function getStatusBadgeClass(status) {
     .trim();
 
   // Hijau
-  if (norm === "TERDAFTAR" || norm === "VALID") {
+  if (norm === "TERDAFTAR") {
     return "status-terdaftar";
   }
 
   // Merah (cover variasi penulisan)
   if (
     norm === "BELUM TL" ||
-    norm === "BELUM-TL" ||
-    norm === "BELUM_TL" ||
-    norm === "TIDAK VALID" ||
     norm === "TIDAK_VALID" ||
     norm === "VALID"
   ) {
