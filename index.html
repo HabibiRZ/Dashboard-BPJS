@@ -1101,11 +1101,12 @@
         x === 'BELUM_TL' ||
         x === 'BELUM-TL' ||
         x === 'TIDAK VALID' ||
-        x === 'TIDAK_VALID'
+        x === 'TIDAK_VALID' ||
+        x === 'VALID'
         ) {
         return 'Belum Terdaftar';
         }
-        if (x === 'VALID' || x === 'TERDAFTAR') {
+        if (x === 'TERDAFTAR') {
         return 'Terdaftar';
         }
 
@@ -1133,6 +1134,7 @@
         // status lain otomatis abu
     };
 
+
     // Ambil semua label dari hasil hitung
     const rawLabels = Object.keys(statusCounts);
 
@@ -1140,6 +1142,7 @@
     const displayLabels = rawLabels.map((l) =>
         l === 'Terdaftar' ? 'Terdaftar' : l
     );
+    
 
     // Dataset: jumlah proyek per status
     const values = rawLabels.map((l) => statusCounts[l] || 0);

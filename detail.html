@@ -341,10 +341,9 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .status-valid { background-color: #28a745; }        /* Hijau */
-        .status-belum-tl { background-color: #dc3545; }     /* Merah */
-        .status-terdaftar { background-color: #0066cc; }    /* Biru */
-        .status-unknown { background-color: black; }      /* Abu-abu */
+
+        .status-terdaftar { background-color: #28a745; }    /* Biru */
+        .status-unknown { background-color: #dc3545; }      /* Abu-abu */
 
         .back-button {
             display: inline-block;
@@ -1133,6 +1132,8 @@ function updateStatusChart(data) {
         // status lain otomatis abu
     };
 
+
+    
     // Ambil semua label dari hasil hitung
     const rawLabels = Object.keys(statusCounts);
 
@@ -1192,69 +1193,6 @@ function updateStatusChart(data) {
     });
     }
 
-
-// function updateSumberDanaChart(data) {
-//     const sumberDanaValues = {};
-//     data.forEach(project => {
-//         const sumber = project.sumberDana || 'Tidak Diketahui';
-//         sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + project.nilaiProyek;
-//     });
-
-//     const labels = Object.keys(sumberDanaValues);
-//     const values = Object.values(sumberDanaValues);
-//     const colors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
-
-//     if (sumberDanaChart) { 
-//         sumberDanaChart.destroy(); 
-//     }
-
-//     const ctx = document.getElementById('sumberDanaChart').getContext('2d');
-//     sumberDanaChart = new Chart(ctx, {
-//         type: 'bar',
-//         data: {
-//             labels: labels,
-//             datasets: [{
-//                 label: 'Potensi Iuran',
-//                 data: values,
-//                 backgroundColor: colors,
-//                 borderColor: colors,
-//                 borderWidth: 1
-//             }]
-//         },
-//         options: {
-//             responsive: true,
-//             maintainAspectRatio: false,
-//             indexAxis: 'y',
-//             plugins: {
-//                 legend: { display: false },
-//                 tooltip: { 
-//                     callbacks: { 
-//                         label: (tooltipItem) => `${formatCurrency(tooltipItem.raw)}` 
-//                     } 
-//                 }
-//             },
-//             scales: {
-//                 x: {
-//                     beginAtZero: true,
-//                     ticks: { 
-//                         callback: (value) => formatCurrency(value), 
-//                         color: 'var(--color-text-dark)' 
-//                     },
-//                     grid: { color: '#e0e0e0' }
-//                 },
-//                 y: {
-//                     ticks: { 
-//                         color: 'var(--color-text-dark)',
-//                         font: { size: 11 }
-//                     },
-//                     grid: { color: '#e0e0e0' }
-//                 }
-//             }
-//         }
-//     });
-    
-//     console.log(`📊 Sumber Dana Chart Updated:`, sumberDanaValues);
-// }
 
 function updateDetailTable(data) {
   const tableBody = document.getElementById('tableBody');
