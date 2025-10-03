@@ -1086,6 +1086,7 @@ function updateSummaryCards(data) {
   console.log(`📊 Summary Updated | Proyek:${totalProjects} | Nilai:${formatCurrency(totalValue)} | Potensi:${formatCurrency(potensi)}`);
 }
 
+// normalisasi
 function normalizeMapStatus(s) {
   const x = String(s ?? '')
     .normalize('NFKC')
