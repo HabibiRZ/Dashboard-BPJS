@@ -210,7 +210,7 @@
             height: 300px;
         }
 
-        .status-lkpp { background-color: var(--color-yellow-accent); color:#333; }
+        /* .status-lkpp { background-color: var(--color-yellow-accent); color:#333; } */
 
         .table-actions {
         display: flex;  
@@ -329,21 +329,27 @@
         .project-link:hover{ opacity:.8; }
 
 
-        .status-badge {
+        .status-badge { 
             padding: 8px 16px;
             border-radius: 30px;
             font-size: 0.85rem;
             font-weight: 600;
             text-transform: capitalize;
-            color: var(--color-text-light);
+            color: #fff;              /* teks putih */
             display: inline-block;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
 
-        .status-terdaftar { background-color: #28a745; }    /* Biru */
-        .status-unknown { background-color: #dc3545; }      /* Abu-abu */
+        
+
+    .status-terdaftar { background-color: #2ecc71; }      /* hijau baru */
+    .status-belum-terdaftar { background-color: #e74c3c; }/* merah baru */
+    .status-unknown { background-color: #95a5a6; }         /* abu baru */
+
+        /* Biar yang tak terpetakan tidak ikut merah */
+        .status-unknown { background-color: #6c757d; }  
 
         .back-button {
             display: inline-block;
@@ -1080,6 +1086,31 @@ function updateSummaryCards(data) {
   console.log(`📊 Summary Updated | Proyek:${totalProjects} | Nilai:${formatCurrency(totalValue)} | Potensi:${formatCurrency(potensi)}`);
 }
 
+// === Helper global: normalisasi & mapping status ===
+function normalizeMapStatus(s) {
+  const x = String(s ?? '')
+    .normalize('NFKC')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, ' ');
+
+  if (
+    x === 'BELUM TL' ||
+    x === 'BELUM_TL' ||
+    x === 'BELUM-TL' ||
+    x === 'TIDAK VALID' ||
+    x === 'TIDAK_VALID'
+  ) {
+    return 'Belum Terdaftar';
+  }
+  if (x === 'VALID' || x === 'TERDAFTAR') {
+    return 'Terdaftar';
+  }
+
+  // default: title case dari input
+  return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 
 function updateCharts(data) {
     updateStatusChart(data);
@@ -1088,29 +1119,30 @@ function updateCharts(data) {
 
 function updateStatusChart(data) {
     // --- Helper: normalisasi & mapping status ---
-    const normalizeMapStatus = (s) => {
-        const x = String(s ?? '')
-        .normalize('NFKC')
-        .trim()
-        .toUpperCase()
-        .replace(/\s+/g, ' ');
+const normalizeMapStatus = (s) => {
+  const x = String(s ?? '')
+    .normalize('NFKC')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, ' ');
 
-        if (
-        x === 'BELUM TL' ||
-        x === 'BELUM_TL' ||
-        x === 'BELUM-TL' ||
-        x === 'TIDAK VALID' ||
-        x === 'TIDAK_VALID'
-        ) {
-        return 'Belum Terdaftar';
-        }
-        if (x === 'VALID' || x === 'TERDAFTAR') {
-        return 'Terdaftar';
-        }
+  if (
+    x === 'BELUM TL' ||
+    x === 'BELUM_TL' ||
+    x === 'BELUM-TL' ||
+    x === 'TIDAK VALID' ||
+    x === 'TIDAK_VALID'
+  ) {
+    return 'Belum Terdaftar';
+  }
+  if (x === 'VALID' || x === 'TERDAFTAR') {
+    return 'Terdaftar';
+  }
 
-        // default: pakai label asli (title case), bukan "Tidak Diketahui"
-        return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-    };
+  // default: pakai label asli (title case)
+  return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 
     // Hitung count & total potensi iuran per status
     const statusCounts = {};
@@ -1133,7 +1165,6 @@ function updateStatusChart(data) {
     };
 
 
-    
     // Ambil semua label dari hasil hitung
     const rawLabels = Object.keys(statusCounts);
 
@@ -1198,7 +1229,6 @@ function updateDetailTable(data) {
   const tableBody = document.getElementById('tableBody');
   tableBody.innerHTML = '';
 
-  // Jika tidak ada data -> tampilkan 1 baris info (tanpa variabel yang undefined)
   if (!data || data.length === 0) {
     const row = document.createElement('tr');
     row.innerHTML = `<td colspan="8" style="text-align:center; color:#666; padding:18px;">
@@ -1208,16 +1238,35 @@ function updateDetailTable(data) {
     return;
   }
 
-  console.log(`📋 Building table with ${data.length} rows`);
-
   data.forEach((project, index) => {
     const row = document.createElement('tr');
 
-    // badge status
-    const statusClass = getStatusBadgeClass(project.statusPotensi);
-    const statusBadge = `<span class="status-badge ${statusClass}">${project.statusPotensi}</span>`;
+    // pakai label final yg sudah dinormalisasi
+    const statusLabel = normalizeMapStatus(project.statusPotensi);
 
-    // <<< PENTING: span klik-able untuk Nama Proyek
+    // tentukan warna inline (hindari konflik CSS)
+    const bg =
+      statusLabel === 'Terdaftar'        ? '#2ecc71' :   // hijau
+      statusLabel === 'Belum Terdaftar'  ? '#e74c3c' :   // merah
+                                           '#95a5a6';    // abu
+
+    const statusBadge = `
+      <span class="status-badge" style="
+        background:${bg} !important;
+        color:#fff;
+        padding:8px 16px;
+        border-radius:30px;
+        font-size:.85rem;
+        font-weight:600;
+        text-transform:capitalize;
+        display:inline-block;
+        letter-spacing:.5px;
+        box-shadow:0 2px 4px rgba(0,0,0,.1);
+      ">
+        ${statusLabel}
+      </span>
+    `;
+
     const encodedNama = encodeURIComponent(project.namaProyek || '');
 
     row.innerHTML = `
@@ -1226,14 +1275,14 @@ function updateDetailTable(data) {
       <td>${project.kodeTender || '-'}</td>
       <td>${project.kodeProyek || '-'}</td>
       <td>
-        <div style="font-weight: 600; margin-bottom: 4px;">
+        <div style="font-weight:600; margin-bottom:4px;">
           <span class="project-link" data-proyek="${encodedNama}">${project.namaProyek}</span>
         </div>
-        <div style="font-size: 0.8em; color: #666;">
+        <div style="font-size:.8em; color:#666;">
           Pelaksana: ${project.namaPelaksana || 'Tidak diketahui'}
         </div>
       </td>
-      <td style="font-weight: 600; color: var(--color-primary);">
+      <td style="font-weight:600; color: var(--color-primary);">
         ${formatCurrency(project.nilaiProyek)}
       </td>
       <td>${project.sumberDana || '-'}</td>
@@ -1241,21 +1290,43 @@ function updateDetailTable(data) {
     `;
     tableBody.appendChild(row);
   });
-
-  console.log(`✅ Table updated with ${data.length} projects`);
 }
+
 
 
 function getStatusBadgeClass(status) {
-    const statusLower = (status || '').toLowerCase();
-    switch(statusLower) {
-        case 'valid': return 'status-valid';
-        case 'belum tl': return 'status-belum-tl';
-        case 'terdaftar': return 'status-terdaftar';
-        case 'lkpp': return 'status-lkpp';
-        default: return 'status-unknown';
-    }
+  const norm = String(status || "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Hijau
+  if (norm === "TERDAFTAR" || norm === "VALID") {
+    return "status-terdaftar";
+  }
+
+  // Merah (cover variasi penulisan)
+  if (
+    norm === "BELUM TL" ||
+    norm === "BELUM-TL" ||
+    norm === "BELUM_TL" ||
+    norm === "TIDAK VALID" ||
+    norm === "TIDAK_VALID" ||
+    norm === "VALID"
+  ) {
+    return "status-belum-terdaftar";
+  }
+
+  
+
+  // Default
+  return "status-unknown";
+
+
 }
+
 
 function showLoading(show) {
     let loader = document.getElementById('loadingIndicator');
