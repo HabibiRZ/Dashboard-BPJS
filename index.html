@@ -7,403 +7,402 @@
     <title>KANTOR CABANG MEDAN KOTA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-   <style>
-    :root {
-        --color-primary: #004c99; /* Biru BPJS */
-        --color-secondary: #0066cc; /* Biru Terang */
-        --color-green: #28a745;    /* Hijau Awal */
-        --color-yellow-accent: #ffc107; /* Kuning (untuk highlight/warning) */
-        --color-background: #f0f3f6; /* Abu-abu Muda */
-        --color-surface: #ffffff; /* Putih */
-        --color-text-dark: #333333;
-        --color-text-light: #ffffff;
-        --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Shadow lebih kecil */
-        --border-radius: 8px; /* Radius lebih kecil */
-        --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    <style>
+        :root {
+            --color-primary: #004c99; /* Biru BPJS */
+            --color-secondary: #0066cc; /* Biru Terang */
+            --color-green: #28a745;    /* Hijau Awal */
+            --color-yellow-accent: #ffc107; /* Kuning (untuk highlight/warning) */
+            --color-background: #f0f3f6; /* Abu-abu Muda */
+            --color-surface: #ffffff; /* Putih */
+            --color-text-dark: #333333;
+            --color-text-light: #ffffff;
+            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Shadow lebih kecil */
+            --border-radius: 8px; /* Radius lebih kecil */
+            --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        font-family: var(--font-family);
-        background-color: var(--color-background);
-        color: var(--color-text-dark);
-        min-height: 100vh;
-        padding: 10px; 
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .container {
-        /* Lebar container dibatasi agar tidak terlalu lebar di layar besar */
-        max-width: 1200px; 
-        margin: 0 auto;
-        flex-grow: 1;
-        background: var(--color-surface);
-        border-radius: var(--border-radius);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        padding: 15px; 
-        display: flex;
-        flex-direction: column;
-        gap: 10px; 
-    }
-
-    header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: var(--color-surface);
-        padding: 5px 0; 
-        border-bottom: 1px solid #e0e0e0; 
-    }
-
-    .header-section {
-        display: flex;
-        align-items: center;
-    }
-
-    .header-logo {
-        height: 50px; 
-        margin-right: 8px;
-        border-radius: 6px;
-    }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-background);
+            color: var(--color-text-dark);
+            min-height: 100vh;
+            padding: 10px; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
         
-    .header-logo:last-of-type {
-        margin-right: 0;
-    }
+        .container {
+            /* Lebar container dibatasi agar tidak terlalu lebar di layar besar */
+            max-width: 1200px; 
+            margin: 0 auto;
+            flex-grow: 1;
+            background: var(--color-surface);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 15px; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+        }
 
-    .header-title {
-        text-align: center;
-        flex-grow: 1;
-    }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--color-surface);
+            padding: 5px 0; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+
+        .header-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            height: 50px; 
+            margin-right: 8px;
+            border-radius: 6px;
+        }
+            
+        .header-logo:last-of-type {
+            margin-right: 0;
+        }
+
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+        }
+            
+        .header-title h1 {
+            font-size: 1.1rem; 
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+            
+        .header-title p {
+            font-size: 0.8rem; 
+            font-weight: 500;
+            color: #000000;
+            font-style: italic;
+        }
+
+        .header-person {
+            height: 35px; 
+            margin-left: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #008000; /* Hijau solid, lebih mirip gambar */
+            color: var(--color-text-light);
+            padding: 8px 15px; /* Padding sedikit lebih besar */
+            margin-bottom: 5px; 
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            font-size: 1em; 
+        }
+            
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem; /* UKURAN FONT TANGGAL DIKECILKAN */
+            font-weight: 700; /* Tetap tebal */
+        }
+
+        .top-bar-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .nav-button {
+            display: inline-block;
+            margin: 0 5px; 
+            padding: 6px 15px; 
+            font-size: 0.9em;
+            color: var(--color-primary);
+            background-color: var(--color-surface);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #e9eef2;
+        }
         
-    .header-title h1 {
-        font-size: 1.1rem; 
-        color: var(--color-primary);
-        font-weight: 700;
-        margin-bottom: 3px;
-    }
+        /* Status Indicator untuk top-bar */
+        .status-indicator {
+            margin-left: 15px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        .status-loading { background-color: var(--color-yellow-accent); color: var(--color-text-dark); }
+        .status-online { background-color: #00b894; color: var(--color-text-light); }
+        .status-error { background-color: #d63031; color: var(--color-text-light); }
+
+
+        h2 {
+            font-size: 1.2rem; 
+            font-weight: 700;
+            margin-bottom: 10px; 
+            color: var(--color-primary);
+            text-align: center;
+        }
+            
+        .panel {
+            background-color: var(--color-surface);
+            padding: 15px;
+            border: 1px solid #edf2f7;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            flex-grow: 1;
+        }
+
+        /* Dashboard Grid Layout (50:50) */
+        .dashboard {
+            display: grid;
+            grid-template-areas:  
+                "summary table"
+                "charts table"; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: auto 1fr; 
+            gap: 5px 10px; 
+            flex-grow: 1;
+            height: calc(100vh - 80px); 
+            padding-bottom: 0; 
+        }
+            
+        /* Area-Area BARU */
+        .summary-area { grid-area: summary; padding: 10px; } 
+        .charts-area { 
+            grid-area: charts; 
+            padding: 10px; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; 
+            overflow-y: hidden; 
+            margin-bottom: 0 !important; 
+        } 
+        .table-area { 
+            grid-area: table; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 10px; 
+            margin-bottom: 0 !important;
+        }
         
-    .header-title p {
-        font-size: 0.8rem; 
-        font-weight: 500;
-        color: #000000;
-        font-style: italic;
-    }
+        .summary-cards-wrapper { 
+            display: flex;
+            flex-direction: column;
+            gap: 5px; 
+        }
 
-    .header-person {
-        height: 35px; 
-        margin-left: 10px;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-    }
+        .summary-cards-wrapper h2 {
+            margin-bottom: 5px;
+            text-align: left;
+            padding-left: 5px;
+            font-size: 1rem; 
+        }
 
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #008000; /* Hijau solid, lebih mirip gambar */
-        color: var(--color-text-light);
-        padding: 8px 15px; /* Padding sedikit lebih besar */
-        margin-bottom: 5px; 
-        font-weight: 500;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        font-size: 1em; 
-    }
+        .summary-cards {
+            display: flex; 
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 5px; 
+        }
+            
+        .summary-cards .card {
+            width: calc(33.333% - 4px); 
+            min-width: 90px; 
+            padding: 8px 4px; 
+            text-align: center;
+            align-items: center;
+            height: 70px; 
+            justify-content: center; 
+        }
+
+        .summary-cards .card h3 {
+            font-size: 0.65rem; 
+            font-weight: 500;
+            margin: 0 0 2px 0; 
+            line-height: 1.1; 
+            opacity: 0.9;
+            text-align: center;
+            white-space: normal; 
+        }
+
+        .summary-cards .card .value {
+            font-size: 1.3rem; 
+            font-weight: 700;
+            margin: 1px 0;
+            line-height: 1.1; 
+            text-align: center;
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .summary-cards .card .currency {
+            font-size: 0.7rem;
+            line-height: 1.1;
+        }
+
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+            overflow-y: auto; 
+        }
+
+        .chart-card {
+            padding: 8px;
+            box-shadow: none; 
+            border: none;
+            background-color: transparent;
+        }
         
-    .top-bar-left {
-        display: flex;
-        align-items: center;
-        font-size: 1.2rem; /* Ukuran font lebih besar */
-        font-weight: 700; /* Tebal */
-    }
+        .charts-area .chart-card:nth-child(2) {
+            flex-grow: 1; 
+        }
 
-    .top-bar-nav {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-grow: 1;
-    }
+        .chart-card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
 
-    .nav-button {
-        display: inline-block;
-        margin: 0 5px; 
-        padding: 6px 15px; 
-        font-size: 0.9em;
-        color: var(--color-primary);
-        background-color: var(--color-surface);
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
-
-    .nav-button:hover {
-        background-color: #e9eef2;
-    }
-    
-    /* Status Indicator untuk top-bar */
-    .status-indicator {
-        margin-left: 15px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.8em;
-    }
-    .status-loading { background-color: var(--color-yellow-accent); color: var(--color-text-dark); }
-    .status-online { background-color: #00b894; color: var(--color-text-light); }
-    .status-error { background-color: #d63031; color: var(--color-text-light); }
+        .chart-container {
+            position: relative;
+            height: 170px; 
+        }
 
 
-    h2 {
-        font-size: 1.2rem; 
-        font-weight: 700;
-        margin-bottom: 10px; 
-        color: var(--color-primary);
-        text-align: center;
-    }
+        /* Style untuk Tabel */
+        .table-area h2 {
+            text-align: left;
+            margin-bottom: 5px;
+            padding: 0 5px;
+        }
+
+        .data-table-container {
+            /* Batasi tinggi tabel agar hanya 13 baris terlihat */
+            max-height: 560px; 
+            overflow-y: auto;
+            /* Hilangkan scroll horizontal pada container */
+            overflow-x: hidden; 
+            flex-grow: 1;
+            padding-bottom: 0;
+            border-radius: var(--border-radius);
+            border: 1px solid #edf2f7; 
+        }
         
-    .panel {
-        background-color: var(--color-surface);
-        padding: 15px;
-        border: 1px solid #edf2f7;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        flex-grow: 1;
-    }
+        .table-area.panel {
+            padding: 0; 
+            border: none;
+            box-shadow: none;
+        }
 
-    /* Dashboard Grid Layout (50:50) */
-    .dashboard {
-        display: grid;
-        grid-template-areas:  
-            "summary table"
-            "charts table"; 
-        grid-template-columns: 1fr 1fr; 
-        grid-template-rows: auto 1fr; 
-        gap: 5px 10px; 
-        flex-grow: 1;
-        height: calc(100vh - 80px); 
-        padding-bottom: 0; 
-    }
+        .data-table thead th {
+            position: sticky;
+            top: 0; 
+            z-index: 15;
+            padding: 8px 6px; 
+            font-size: 0.75rem; 
+            text-align: center;
+            line-height: 1.1; 
+            background: linear-gradient(135deg, var(--color-primary), #0056b3);
+            color: var(--color-text-light);
+            font-weight: 600;
+            /* Hapus white-space: nowrap agar teks header wrap */
+            white-space: normal; 
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid #003a73; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
         
-    /* Area-Area BARU */
-    .summary-area { grid-area: summary; padding: 10px; } 
-    .charts-area { 
-        grid-area: charts; 
-        padding: 10px; 
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 8px; 
-        overflow-y: hidden; 
-        margin-bottom: 0 !important; 
-    } 
-    .table-area { 
-        grid-area: table; 
-        overflow: hidden; 
-        display: flex; 
-        flex-direction: column; 
-        padding: 10px; 
-        margin-bottom: 0 !important;
-    }
-    
-    .summary-cards-wrapper { 
-        display: flex;
-        flex-direction: column;
-        gap: 5px; 
-    }
-
-    .summary-cards-wrapper h2 {
-        margin-bottom: 5px;
-        text-align: left;
-        padding-left: 5px;
-        font-size: 1rem; 
-    }
-
-    .summary-cards {
-        display: flex; 
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        gap: 5px; 
-    }
+        .data-table th:first-child, .data-table td:first-child {
+             text-align: center; 
+        }
         
-    .summary-cards .card {
-        width: calc(33.333% - 4px); 
-        min-width: 90px; 
-        padding: 8px 4px; 
-        text-align: center;
-        align-items: center;
-        height: 70px; 
-        justify-content: center; 
-    }
-
-    .summary-cards .card h3 {
-        font-size: 0.65rem; 
-        font-weight: 500;
-        margin: 0 0 2px 0; 
-        line-height: 1.1; 
-        opacity: 0.9;
-        text-align: center;
-        white-space: normal; 
-    }
-
-    .summary-cards .card .value {
-        font-size: 1.3rem; 
-        font-weight: 700;
-        margin: 1px 0;
-        line-height: 1.1; 
-        text-align: center;
-        overflow: hidden; 
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .summary-cards .card .currency {
-        font-size: 0.7rem;
-        line-height: 1.1;
-    }
-
-    .charts-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        flex-grow: 1;
-        overflow-y: auto; 
-    }
-
-    .chart-card {
-        padding: 8px;
-        box-shadow: none; 
-        border: none;
-        background-color: transparent;
-    }
-    
-    .charts-area .chart-card:nth-child(2) {
-        flex-grow: 1; 
-    }
-
-    .chart-card h3 {
-        font-size: 0.9rem;
-        margin-bottom: 5px;
-    }
-
-    .chart-container {
-        position: relative;
-        height: 170px; 
-    }
-
-
-    /* Style untuk Tabel */
-    .table-area h2 {
-        text-align: left;
-        margin-bottom: 5px;
-        padding: 0 5px;
-    }
-
-    .data-table-container {
-        /* Batasi tinggi tabel agar hanya 13 baris terlihat */
-        max-height: 560px; 
-        overflow-y: auto;
-        /* Hilangkan scroll horizontal pada container */
-        overflow-x: hidden; 
-        flex-grow: 1;
-        padding-bottom: 0;
-        border-radius: var(--border-radius);
-        border: 1px solid #edf2f7; 
-    }
-    
-    .table-area.panel {
-        padding: 0; 
-        border: none;
-        box-shadow: none;
-    }
-
-    .data-table thead th {
-        position: sticky;
-        top: 0; 
-        z-index: 15;
-        padding: 8px 6px; 
-        font-size: 0.75rem; 
-        text-align: center;
-        line-height: 1.1; 
-        background: linear-gradient(135deg, var(--color-primary), #0056b3);
-        color: var(--color-text-light);
-        font-weight: 600;
-        /* Hapus white-space: nowrap agar teks header wrap */
-        white-space: normal; 
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        border: 1px solid #003a73; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .data-table th:first-child, .data-table td:first-child {
-         text-align: center; 
-    }
-    
-    .center-text {
-        text-align: center !important;
-    }
-    
-    .data-table td {
-        padding: 4px 6px; 
-        font-size: 0.8rem; 
-        text-align: left;
-        border-bottom: 1px solid #edf2f7;
-        min-height: 35px; 
-        height: 35px;
-    }
+        .center-text {
+            text-align: center !important;
+        }
         
-    .data-table { 
-        width: 100%;
-        border-collapse: collapse;
-        /* Pastikan layout tabel fixed untuk mencegah pelebaran kolom */
-        table-layout: fixed; 
-    }
-    
-    /* Lebar kolom spesifik */
-    .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 8%; } /* No. */
-    .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 15%; } /* Jumlah Proyek */
-    .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 77%; } /* Nama Instansi (Sisa Lebar) */
+        .data-table td {
+            padding: 4px 6px; 
+            font-size: 0.8rem; 
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+            min-height: 35px; 
+            height: 35px;
+        }
+            
+        .data-table { 
+            width: 100%;
+            border-collapse: collapse;
+            /* Pastikan layout tabel fixed untuk mencegah pelebaran kolom */
+            table-layout: fixed; 
+        }
+        
+        /* Lebar kolom spesifik */
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 8%; } /* No. */
+        .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 15%; } /* Jumlah Proyek */
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 77%; } /* Nama Instansi (Sisa Lebar) */
 
-    
-    .card {
-        background-color: var(--color-surface);
-        box-shadow: var(--box-shadow);
-        border-radius: var(--border-radius);
-        text-align: center;
-        color: var(--color-text-light);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        flex-grow: 1; 
-    }
-    
-    /* Perbaikan sintaks: pastikan titik koma dan titik dua benar */
-    .card.total-projects { background: linear-gradient(135deg, var(--color-green), #20c997); }
-    .card.total-value { background: linear-gradient(135deg, var(--color-primary), #0056b3); }
-    .card.avg-value { background: linear-gradient(135deg, var(--color-secondary), #0052cc); }
-    
-    .data-table tr:nth-child(even) { background-color: #f8fafc; }
-    .instansi-link { color: var(--color-secondary); font-weight: 500; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .card {
+            background-color: var(--color-surface);
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            text-align: center;
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; 
+        }
+        
+        .card.total-projects { background: linear-gradient(135deg, var(--color-green), #20c997); }
+        .card.total-value { background: linear-gradient(135deg, var(--color-primary), #0056b3); }
+        .card.avg-value { background: linear-gradient(135deg, var(--color-secondary), #0052cc); }
+        
+        .data-table tr:nth-child(even) { background-color: #f8fafc; }
+        .instansi-link { color: var(--color-secondary); font-weight: 500; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 
-    /* ================== Media Queries untuk Responsif ================== */
-    /* ... (CSS Responsif dihilangkan untuk brevity, tapi harus tetap ada di kode final) ... */
+        /* ================== Media Queries untuk Responsif ================== */
+        /* ... (CSS Responsif dihilangkan untuk brevity, tapi harus tetap ada di kode final) ... */
 
-</style>
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div class="header-section">
                 <img src="medan.png" alt="Logo Kota Medan" class="header-logo">
-
+                <img src="pemprovsu.png" alt="Logo Pemprovsu" class="header-logo">
             </div>
             <div class="header-title">
                 <h1>DASHBOARD POTENSI JASA KONSTRUKSI</h1>
@@ -969,7 +968,7 @@
             }
         }
 
-        // Function to manually refresh data
+        // Function to manually refresh data - NOTIFIKASI BERHASIL DIHILANGKAN
         function refreshData() {
             updateConnectionStatus('loading', 'Memuat ulang...');
             
@@ -977,22 +976,9 @@
                 .then(data => {
                     if (data && data.length > 0) {
                         updateDashboard(data);
+                        // Status koneksi di-update, tapi pop-up sukses dihilangkan
                         updateConnectionStatus('online', `${data.length} data berhasil dimuat`);
                         console.log(`✅ Data refreshed successfully: ${data.length} records`);
-                        
-                        // Show success message briefly
-                        const successDiv = document.createElement('div');
-                        successDiv.innerHTML = `
-                            <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                                ✅ Data berhasil diperbarui!
-                            </div>
-                        `;
-                        document.body.appendChild(successDiv);
-                        setTimeout(() => {
-                            if (successDiv.parentElement) {
-                                successDiv.remove();
-                            }
-                        }, 3000);
                     } else {
                         updateConnectionStatus('error', 'Tidak ada data');
                     }
