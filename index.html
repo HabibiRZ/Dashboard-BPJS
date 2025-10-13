@@ -283,7 +283,7 @@
         }
         
         .charts-area .chart-card:nth-child(2) {
-            flex-grow: 1; 
+            flex-grow: 1;    
         }
 
         .chart-card h3 {
@@ -391,7 +391,23 @@
         .data-table tr:nth-child(even) { background-color: #f8fafc; }
         .instansi-link { color: var(--color-secondary); font-weight: 500; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-
+        .main-footer {
+            background: linear-gradient(135deg, var(--color-green), #20c997); /* Gradasi Hijau */
+            color: var(--color-text-light);
+            padding: 8px 15px; /* Padding lebih kecil, sesuai top-bar */
+            font-size: 0.9em; /* Ukuran font lebih kecil */
+            text-align: right; /* Rata kanan */
+            margin-top: 10px; /* Jarak dari konten di atasnya */
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow); /* Shadow konsisten */
+            font-weight: 500; /* Tidak terlalu tebal */
+        }
+        
+        .footer-text {
+            /* Tidak perlu div khusus, langsung di p */
+            margin: 0; /* Hapus margin default p */
+            line-height: 1.4;
+        }
         /* ================== Media Queries untuk Responsif ================== */
         /* ... (CSS Responsif dihilangkan untuk brevity, tapi harus tetap ada di kode final) ... */
 
@@ -483,9 +499,11 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            </div>
+            </div>    
+        </div>
+        <footer class="main-footer">
+        <p class="footer-text">BPJS Ketenagakerjaan Kantor Cabang Medan Kota</p>
+        </footer>
     </div>
 
 

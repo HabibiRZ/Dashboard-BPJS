@@ -635,7 +635,7 @@
         /* untuk browser modern saja; hapus jika tidak ingin clamp */
         .data-table td .project-link {
         display: -webkit-box;
-        -webkit-line-clamp: 3;   /* tampilkan maksimal 3 baris */
+        /* -webkit-line-clamp: 3;   tampilkan maksimal 3 baris */   
         -webkit-box-orient: vertical;
         overflow: hidden;
         }
@@ -796,8 +796,8 @@
   position: sticky;
   top: 0;                       /* jarak dari atas .table-wrapper; ubah bila perlu */
   z-index: 100;                 /* harus lebih besar dari z-index td */
-  background: #ffffff;          /* solid supaya teks isi tidak tembus */
-  color: #0b66b2;               /* teks header */
+  background: #0b66b2;          /* solid supaya teks isi tidak tembus */
+  color: #ffffff;               /* teks header */
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
