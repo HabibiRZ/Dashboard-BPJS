@@ -694,117 +694,197 @@
         }
 
         function updateStatusChart(data) {
-        // --- Helper: normalisasi & mapping status ---
-        const normalizeMapStatus = (s) => {
-            const x = String(s ?? '')
+    // fallback safe: jika computePotensiIuran / formatCurrency belum ada, buat versi sederhana
+    if (typeof computePotensiIuran !== 'function') {
+        window.computePotensiIuran = function(nilaiProyek) {
+            return Number(nilaiProyek) ? Number(nilaiProyek) * 0.00127 : 0;
+        };
+    }
+    if (typeof formatCurrency !== 'function') {
+        window.formatCurrency = function(num) {
+            return (Number(num) || 0).toLocaleString('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            }).replace(',00', '');
+        };
+    }
+
+    // --- Helper: normalisasi & mapping status ---
+    const normalizeMapStatus = (s) => {
+        const x = String(s ?? '')
             .normalize('NFKC')
             .trim()
             .toUpperCase()
             .replace(/\s+/g, ' ');
 
-            if (
+        if (
             x === 'BELUM TL' ||
             x === 'BELUM_TL' ||
             x === 'BELUM-TL' ||
             x === 'TIDAK VALID' ||
             x === 'TIDAK_VALID' ||
             x === 'VALID'
-            ) {
+        ) {
             return 'Belum Terdaftar';
-            }
-            if (x === 'TERDAFTAR') {
+        }
+        if (x === 'TERDAFTAR') {
             return 'Terdaftar';
-            }
+        }
 
-            // default: pakai label asli (title case), bukan "Tidak Diketahui"
-            return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-        };
+        // default: pakai label asli (title case)
+        return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+    };
 
-        // Hitung count & total potensi iuran per status
-        const statusCounts = {};
-        const statusPotensi = {};
+    // Hitung count & total potensi iuran per status
+    const statusCounts = {};
+    const statusPotensi = {};
 
-        data.forEach((project) => {
-            const statusFinal = normalizeMapStatus(project.statusPotensi);
-            const nilai = Number(project.nilaiProyek) || 0;
-            const pot = computePotensiIuran(nilai);
+    (data || []).forEach((project) => {
+        const statusFinal = normalizeMapStatus(project.statusPotensi);
+        const nilai = Number(project.nilaiProyek) || 0;
+        const pot = computePotensiIuran(nilai);
 
-            statusCounts[statusFinal] = (statusCounts[statusFinal] || 0) + 1;
-            statusPotensi[statusFinal] = (statusPotensi[statusFinal] || 0) + pot;
-        });
+        statusCounts[statusFinal] = (statusCounts[statusFinal] || 0) + 1;
+        statusPotensi[statusFinal] = (statusPotensi[statusFinal] || 0) + pot;
+    });
 
-        // Warna konsisten per status final
-        const colorMap = {
-            'terdaftar': '#0066cc',
-            'belum terdaftar': '#dc3545'
-            // status lain otomatis abu
-        };
+    // Warna konsisten per status final
+    const colorMap = {
+        'terdaftar': '#0066cc',
+        'belum terdaftar': '#dc3545'
+    };
 
+    // Ambil semua label dari hasil hitung (maintain insertion order)
+    const rawLabels = Object.keys(statusCounts);
 
-        // Ambil semua label dari hasil hitung
-        const rawLabels = Object.keys(statusCounts);
+    // Label yang ditampilkan
+    const displayLabels = rawLabels.map((l) => l === 'Terdaftar' ? 'Terdaftar' : l);
 
-        // Rename kalau mau tampilkan 'Peserta'
-        const displayLabels = rawLabels.map((l) =>
-            l === 'Terdaftar' ? 'Terdaftar' : l
-        );
-        
+    // Dataset: jumlah proyek per status
+    const values = rawLabels.map((l) => statusCounts[l] || 0);
+    const colors = rawLabels.map((l) => colorMap[l.toLowerCase()] || '#6c757d');
 
-        // Dataset: jumlah proyek per status
-        const values = rawLabels.map((l) => statusCounts[l] || 0);
-        const colors = rawLabels.map(
-            (l) => colorMap[l.toLowerCase()] || '#6c757d'
-        );
+    // Potensi iuran
+    const potensiValues = rawLabels.map((l) => statusPotensi[l] || 0);
+    const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
 
-        // Potensi iuran
-        const potensiValues = rawLabels.map((l) => statusPotensi[l] || 0);
-        const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
+    // destroy previous chart jika ada
+    try {
+        if (window.statusChart && typeof window.statusChart.destroy === 'function') {
+            window.statusChart.destroy();
+        }
+    } catch (e) { /* ignore */ }
+    window.statusChart = null;
 
-        if (statusChart) statusChart.destroy();
+    const ctx = document.getElementById('statusChart').getContext('2d');
 
-        const ctx = document.getElementById('statusChart').getContext('2d');
-        statusChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
+    // register ChartDataLabels kalau tersedia dan belum ter-registrasi
+    if (typeof ChartDataLabels !== 'undefined') {
+        try {
+            // Chart.register idempotent — tidak error jika sudah ter-registrasi
+            Chart.register(ChartDataLabels);
+        } catch (e) { /* ignore */ }
+    }
+
+    // threshold relatif (terhadap max value) untuk memutuskan "di dalam" vs "di atas"
+    const maxValue = values.length ? Math.max(...values) : 0;
+    const thresholdRelative = 0.25; // ubah kalau mau lebih/kurang agresif
+
+    window.statusChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
             labels: displayLabels,
             datasets: [
                 {
-                data: values,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: 'var(--color-surface)',
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: 'var(--color-surface)',
                 },
             ],
-            },
-            options: {
+        },
+        options: {
             responsive: true,
             maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                callbacks: {
-                    label: function (ctx) {
-                    const idx = ctx.dataIndex;
-                    const count = ctx.raw;
-                    const pot = potensiValues[idx] || 0;
-                    const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
+                    callbacks: {
+                        label: function (ctx) {
+                            const idx = ctx.dataIndex;
+                            const count = ctx.raw;
+                            const pot = potensiValues[idx] || 0;
+                            const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
 
-                    return [
-                        `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
-                        `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`,
-                    ];
+                            return [
+                                `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
+                                `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`,
+                            ];
+                        },
                     },
                 },
-                },
-            },
-            },
-        });
-        }
+                // config plugin datalabels
+                datalabels: {
+                    display: true,
+                    formatter: function(value, ctx) {
+                        const idx = ctx.dataIndex;
+                        const pot = potensiValues[idx] || 0;
+                        const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
+                        // tampilkan 2 baris: jumlah proyek (besar) lalu potensi (lebih kecil)
+                        return `${value.toLocaleString('id-ID')} proyek\n${formatCurrency(pot)} (${pct.toFixed(1)}%)`;
+                    },
+                    anchor: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        return val >= (maxValue * thresholdRelative) ? 'center' : 'end';
+                    },
+                    align: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        return val >= (maxValue * thresholdRelative) ? 'center' : 'start';
+                    },
+                    offset: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        return val >= (maxValue * thresholdRelative) ? 0 : -6;
+                    },
+                    color: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        return val >= (maxValue * thresholdRelative) ? '#ffffff' : '#111';
+                    },
+                    font: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        return {
+                            weight: '600',
+                            size: val >= (maxValue * thresholdRelative) ? 12 : 11,
+                        };
+                    },
+                    backgroundColor: function(ctx) {
+                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                        // kalau label ditempatkan di luar (di atas), beri background putih agar terbaca
+                        return val >= (maxValue * thresholdRelative) ? 'transparent' : 'rgba(255,255,255,0.9)';
+                    },
+                    borderRadius: 6,
+                    padding: { top: 6, bottom: 6, left: 8, right: 8 },
+                    lineHeight: 1.05,
+                    clamp: true
+                }
+            }
+        },
+        plugins: (typeof ChartDataLabels !== 'undefined') ? [ChartDataLabels] : []
+    });
+}
+
 
 
         function updateSumberDanaChart(data) {
             const sumberDanaValues = {};
-            data.forEach(project => {
+            data.forEach(project => {   
                 const sumber = project.sumberDana || 'Tidak Diketahui';
                 const nilai = Number(project.nilaiProyek) || 0;
                 sumberDanaValues[sumber] = (sumberDanaValues[sumber] || 0) + nilai;
