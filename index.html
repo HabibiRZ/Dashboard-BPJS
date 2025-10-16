@@ -39,7 +39,6 @@
         }
         
         .container {
-            /* Lebar container dibatasi agar tidak terlalu lebar di layar besar */
             max-width: 1200px; 
             margin: 0 auto;
             flex-grow: 1;
@@ -50,8 +49,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px; 
-            height: calc(100vh - 20px); /* Tinggi container menyesuaikan viewport */
-            overflow: hidden; /* Mencegah overflow container */
+            height: calc(100vh - 20px);
+            overflow: hidden;
         }
 
         header {
@@ -69,7 +68,7 @@
         }
 
         .header-logo {
-            height: 70px; /* NILAI DITINGKATKAN DARI 50px MENJADI 70px */
+            height: 70px;
             margin-right: 8px;
             border-radius: 6px;
         }
@@ -108,9 +107,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #008000; /* Hijau solid, lebih mirip gambar */
+            background-color: #008000;
             color: var(--color-text-light);
-            padding: 8px 15px; /* Padding sedikit lebih besar */
+            padding: 8px 15px;
             margin-bottom: 5px; 
             font-weight: 500;
             border-radius: var(--border-radius);
@@ -121,8 +120,8 @@
         .top-bar-left {
             display: flex;
             align-items: center;
-            font-size: 0.9rem; /* UKURAN FONT TANGGAL DIKECILKAN */
-            font-weight: 700; /* Tetap tebal */
+            font-size: 0.9rem;
+            font-weight: 700;
         }
 
         .top-bar-nav {
@@ -149,7 +148,6 @@
             background-color: #e9eef2;
         }
         
-        /* Status Indicator untuk top-bar */
         .status-indicator {
             margin-left: 15px;
             padding: 2px 6px;
@@ -160,7 +158,6 @@
         .status-loading { background-color: var(--color-yellow-accent); color: var(--color-text-dark); }
         .status-online { background-color: #00b894; color: var(--color-text-light); }
         .status-error { background-color: #d63031; color: var(--color-text-light); }
-
 
         h2 {
             font-size: 1.2rem; 
@@ -177,25 +174,23 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             flex-grow: 1;
-            overflow: hidden; /* Mencegah overflow panel */
+            overflow: hidden;
         }
 
-        /* Dashboard Grid Layout (50:50) - DIPERBAIKI */
         .dashboard {
             display: grid;
             grid-template-areas:  
                 "summary table"
                 "charts table"; 
-            grid-template-columns: 1fr 1fr; 
+            grid-template-columns: 55% 45%;
             grid-template-rows: auto 1fr; 
             gap: 5px 10px; 
             flex-grow: 1;
-            height: calc(100vh - 200px); /* Tinggi disesuaikan agar semua konten terlihat */
+            height: calc(100vh - 200px);
             padding-bottom: 0; 
-            overflow: hidden; /* Mencegah overflow dashboard */
+            overflow: hidden;
         }
             
-        /* Area-Area BARU */
         .summary-area { 
             grid-area: summary; 
             padding: 10px; 
@@ -222,7 +217,7 @@
             flex-direction: column; 
             padding: 10px; 
             margin-bottom: 0 !important;
-            height: 100%; /* Pastikan tinggi penuh */
+            height: 100%;
         }
         
         .summary-cards-wrapper { 
@@ -283,42 +278,168 @@
             line-height: 1.1;
         }
 
+        /* ============================= */
+        /* CHART AREA - IMPROVED LAYOUT */
+        /* ============================= */
+
         .charts-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-            overflow-y: auto; 
-            height: 100%; /* Pastikan tinggi penuh */
+            gap: 6px;
+            height: 100%;
+            overflow: hidden;
         }
 
         .chart-card {
-            padding: 8px;
-            box-shadow: none; 
-            border: none;
-            background-color: transparent;
-            height: 50%; /* Setiap chart card mengambil setengah tinggi */
+            flex: 1;
             display: flex;
             flex-direction: column;
-        }
-        
-        .charts-area .chart-card:nth-child(2) {
-            flex-grow: 1;    
+            background: transparent;
+            border: none;
+            padding: 0;
+            height: 50%;
+            min-height: 250px;
         }
 
         .chart-card h3 {
             font-size: 0.9rem;
-            margin-bottom: 5px;
+            margin: 0 0 4px 4px;
+            color: var(--color-primary);
+            font-weight: 700;
         }
 
         .chart-container {
             position: relative;
-            height: 100%; /* Menggunakan tinggi penuh dari parent */
+            height: 100%;
             flex-grow: 1;
+            display: flex;
         }
 
+        /* Chart + detail berdampingan */
+        .chart-with-details {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            height: calc(100% - 22px);
+            gap: 8px;
+        }
 
-        /* Style untuk Tabel - DIPERBAIKI */
+        .chart-wrapper {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0; /* Penting untuk mencegah overflow */
+        }
+
+        /* Panel rincian - IMPROVED */
+        .chart-details {
+            width: 300px;
+            border-radius: 12px;
+            padding: 12px;
+            background: #ffffff;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            font-size: 0.8rem;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chart-details h4 {
+            text-align: center;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e1e5e9;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+        }
+
+        /* Item detail dalam kotak terpisah yang rapi */
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            min-height: 50px;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Warna border kiri sesuai kategori */
+        .detail-item.red { 
+            border-left: 4px solid #ef4444;
+            background: linear-gradient(to right, #fef2f2, #f8fafc);
+        }
+        .detail-item.blue { 
+            border-left: 4px solid #1d4ed8;
+            background: linear-gradient(to right, #eff6ff, #f8fafc);
+        }
+        .detail-item.dark { 
+            border-left: 4px solid #0f172a;
+            background: linear-gradient(to right, #f1f5f9, #f8fafc);
+        }
+
+        /* Container untuk label dan nilai */
+        .detail-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .detail-label {
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .detail-values {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1f2937;
+        }
+
+        .detail-percent {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* NEW: Iuran styling - sama dengan persen */
+        .detail-iuran {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Style untuk Tabel */
         .table-area h2 {
             text-align: left;
             margin-bottom: 5px;
@@ -329,11 +450,10 @@
         }
 
         .data-table-container {
-            /* Tinggi tabel disesuaikan dengan elemen kiri */
-            height: calc(100% - 40px); /* 40px untuk header tabel */
-            max-height: none; /* Hapus max-height sebelumnya */
+            height: calc(100% - 40px);
+            max-height: none;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: auto;
             flex-grow: 1;
             padding-bottom: 0;
             border-radius: var(--border-radius);
@@ -344,7 +464,7 @@
             padding: 0;
             border: none;
             box-shadow: none;
-            height: 100%; /* Pastikan panel mengambil tinggi penuh */
+            height: 100%;
         }
 
         .data-table thead th {
@@ -385,21 +505,19 @@
         .data-table { 
             width: 100%;
             border-collapse: collapse;
-            /* Pastikan layout tabel fixed untuk mencegah pelebaran kolom */
             table-layout: fixed; 
         }
         
-        /* Lebar kolom spesifik - DIPERBAIKI */
         .data-table th:nth-child(1), .data-table td:nth-child(1) { 
-            width: 10%; /* No. - sedikit lebih lebar */
+            width: 8%;
         }
 
         .data-table th:nth-child(2), .data-table td:nth-child(2) { 
-            width: 70%; /* Nama Instansi - disesuaikan */
+            width: 65%;
         }
 
         .data-table th:nth-child(3), .data-table td:nth-child(3) { 
-            width: 20%; /* Jumlah Proyek - lebih lebar */
+            width: 15%;
         }
 
         .data-table tr:nth-child(even) { 
@@ -435,20 +553,19 @@
         }
 
         .main-footer {
-            background: linear-gradient(135deg, var(--color-green), #20c997); /* Gradasi Hijau */
+            background: linear-gradient(135deg, var(--color-green), #20c997);
             color: var(--color-text-light);
-            padding: 8px 15px; /* Padding lebih kecil, sesuai top-bar */
-            font-size: 0.9em; /* Ukuran font lebih kecil */
-            text-align: right; /* Rata kanan */
-            margin-top: 5px; /* Jarak dari konten di atasnya dikurangi */
+            padding: 8px 15px;
+            font-size: 0.9em;
+            text-align: right;
+            margin-top: 5px;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow); /* Shadow konsisten */
-            font-weight: 500; /* Tidak terlalu tebal */
+            box-shadow: var(--box-shadow);
+            font-weight: 500;
         }
         
         .footer-text {
-            /* Tidak perlu div khusus, langsung di p */
-            margin: 0; /* Hapus margin default p */
+            margin: 0;
             line-height: 1.4;
         }
 
@@ -489,8 +606,19 @@
                 margin-bottom: 5px;
             }
             
-            .chart-container {
-                height: 200px;
+            .charts-area {
+                height: auto;
+                min-height: 600px;
+            }
+            
+            .chart-card {
+                height: auto;
+                min-height: 300px;
+                margin-bottom: 15px;
+            }
+            
+            .chart-card:last-child {
+                margin-bottom: 0;
             }
             
             .data-table-container {
@@ -502,7 +630,39 @@
                 font-size: 0.75rem;
                 text-align: center;
             }
-        }
+            
+             .chart-details {
+        width: 40%; /* Lebar lebih kecil untuk mobile */
+        height: auto;
+        order: 2; /* Tetap di posisi 2 (kanan) */
+        max-height: none; /* Hapus max-height */
+    }
+    
+    .chart-wrapper {
+        width: 60%; /* Chart lebih lebar */
+        order: 1; /* Tetap di posisi 1 (kiri) */
+        height: 250px; /* Tinggi tetap */
+        min-height: 250px;
+    }
+    
+    .detail-item {
+        padding: 8px 10px; /* Padding lebih kecil */
+        min-height: 40px; /* Tinggi lebih kecil */
+    }
+    
+    .detail-label {
+        font-size: 0.75rem; /* Font lebih kecil */
+    }
+    
+    .detail-value {
+        font-size: 0.8rem;
+    }
+    
+    .detail-iuran,
+    .detail-percent {
+        font-size: 0.7rem; /* Font lebih kecil untuk iuran dan persen */
+    }
+}
 
         @media (max-width: 520px) {
             .summary-cards .card {
@@ -520,7 +680,68 @@
             .header-logo {
                 height: 50px;
             }
-        }
+            
+           .chart-with-details {
+        flex-direction: row; /* Tetap horizontal */
+        gap: 8px;
+    }
+    
+    .chart-details {
+        width: 45%;
+        padding: 8px;
+    }
+    
+    .chart-wrapper {
+        width: 55%;
+        height: 200px;
+        min-height: 200px;
+    }
+    
+    .detail-item {
+        padding: 6px 8px;
+        min-height: 35px;
+    }
+    
+    .detail-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+    
+    .detail-values {
+        align-items: flex-start;
+        width: 100%;
+        padding-top: 2px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .detail-label {
+        font-size: 0.7rem;
+    }
+    
+    .detail-value {
+        font-size: 0.75rem;
+    }
+    
+    .detail-iuran,
+    .detail-percent {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .chart-with-details {
+        flex-direction: column; /* Kembali ke vertikal di layar sangat kecil */
+    }
+    
+    .chart-details {
+        width: 100%;
+    }
+    
+    .chart-wrapper {
+        width: 100%;
+    }
+}
 
     </style>
 </head>
@@ -579,13 +800,29 @@
                 <div class="chart-card">
                     <h3>Status Potensi (Total)</h3>
                     <div class="chart-container">
-                        <canvas id="statusChart"></canvas>
+                        <div class="chart-with-details">
+                            <div class="chart-wrapper">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                            <div class="chart-details" id="statusChartDetails">
+                                <h4>Rincian Status</h4>
+                                <!-- Detail akan diisi oleh JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="chart-card">
                     <h3>Nilai Proyek Berdasarkan Sumber Dana (Total)</h3>
                     <div class="chart-container">
-                        <canvas id="sumberDanaChart"></canvas>
+                        <div class="chart-with-details">
+                            <div class="chart-wrapper">
+                                <canvas id="sumberDanaChart"></canvas>
+                            </div>
+                            <div class="chart-details" id="sumberDanaChartDetails">
+                                <h4>Rincian Sumber Dana</h4>
+                                <!-- Detail akan diisi oleh JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -619,15 +856,13 @@
     </div>
 
     <script>
-        // JavaScript tetap sama seperti sebelumnya
         let statusChart = null;
         let sumberDanaChart = null;
 
-        // Configuration for Google Sheets API
         const SHEET_CONFIG = {
             sheetId: "1h9NVeC4Gca7IwQkuLd3kNSqaO4xLbgCBIMQK7I26HGs",
             apiKey: "AIzaSyDDChj-Syqytv2HboLnbflQu7-u_5VAYIE",
-            range: "A2:M1000" // Adjust range as needed
+            range: "A2:M1000"
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -640,8 +875,6 @@
                     updateDashboard(data);
                     updateConnectionStatus('online', `${data.length} data berhasil dimuat`);
                 
-                    
-                    // Store data for potential offline use
                     try {
                         const dataToStore = JSON.stringify(data);
                         if (typeof(Storage) !== "undefined") {
@@ -660,7 +893,6 @@
                 showError("Gagal memuat data dari Google Sheets. Silakan coba lagi.");
             }
             
-            // Add refresh button
             addRefreshButton();
         });
 
@@ -682,9 +914,7 @@
                     return [];
                 }
                 
-                // Process the raw data from Google Sheets
                 const data = result.values.map((row, index) => {
-                    // Map the columns based on the structure visible in your screenshot
                     return {
                         'NO': row[0] || (index + 1).toString(),
                         'KODE RUP': row[1] || '',
@@ -712,7 +942,6 @@
 
         function processData(rawData) {
             return rawData.map((row, index) => {
-                // Clean and process the data
                 const nilaiProyek = cleanCurrencyValue(row['NILAI PROYEK'] || '0');
                 
                 return {
@@ -736,7 +965,6 @@
         function cleanCurrencyValue(value) {
             if (typeof value === 'number') return value;
             if (typeof value === 'string') {
-                // Remove all non-numeric characters except dots and minus signs
                 const cleaned = value.replace(/[^\d.-]/g, '');
                 const parsed = parseFloat(cleaned) || 0;
                 return parsed;
@@ -755,11 +983,11 @@
 
         function computePotensiIuran(amount){
         const tiers = [
-            { cap: 100_000_000, rate: 0.0024 },    // s.d. 100M
-            { cap: 500_000_000, rate: 0.0019 },    // 100M–500M
-            { cap: 1_000_000_000, rate: 0.0015 },  // 500M–1B
-            { cap: 5_000_000_000, rate: 0.0012 },  // 1B–5B
-            { cap: Infinity, rate: 0.0010 }        // >5B
+            { cap: 100_000_000, rate: 0.0024 },
+            { cap: 500_000_000, rate: 0.0019 },
+            { cap: 1_000_000_000, rate: 0.0015 },
+            { cap: 5_000_000_000, rate: 0.0012 },
+            { cap: Infinity, rate: 0.0010 }
         ];
 
         let premi = 0;
@@ -797,201 +1025,215 @@
         console.log(`📊 Summary Updated | Proyek:${totalProjects} | Nilai:${formatCurrency(totalValue)} | Potensi:${formatCurrency(potensi)}`);
         }
 
-
         function updateCharts(data) {
             updateStatusChart(data);
-            console.log(data)
             updateSumberDanaChart(data);
         }
 
         function updateStatusChart(data) {
-    // fallback safe: jika computePotensiIuran / formatCurrency belum ada, buat versi sederhana
-    if (typeof computePotensiIuran !== 'function') {
-        window.computePotensiIuran = function(nilaiProyek) {
-            return Number(nilaiProyek) ? Number(nilaiProyek) * 0.00127 : 0;
-        };
-    }
-    if (typeof formatCurrency !== 'function') {
-        window.formatCurrency = function(num) {
-            return (Number(num) || 0).toLocaleString('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                maximumFractionDigits: 0
-            }).replace(',00', '');
-        };
-    }
-
-    // --- Helper: normalisasi & mapping status ---
-    const normalizeMapStatus = (s) => {
-        const x = String(s ?? '')
-            .normalize('NFKC')
-            .trim()
-            .toUpperCase()
-            .replace(/\s+/g, ' ');
-
-        if (
-            x === 'BELUM TL' ||
-            x === 'BELUM_TL' ||
-            x === 'BELUM-TL' ||
-            x === 'TIDAK VALID' ||
-            x === 'TIDAK_VALID' ||
-            x === 'VALID'
-        ) {
-            return 'Belum Terdaftar';
-        }
-        if (x === 'TERDAFTAR') {
-            return 'Terdaftar';
-        }
-
-        // default: pakai label asli (title case)
-        return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-    };
-
-    // Hitung count & total potensi iuran per status
-    const statusCounts = {};
-    const statusPotensi = {};
-
-    (data || []).forEach((project) => {
-        const statusFinal = normalizeMapStatus(project.statusPotensi);
-        const nilai = Number(project.nilaiProyek) || 0;
-        const pot = computePotensiIuran(nilai);
-
-        statusCounts[statusFinal] = (statusCounts[statusFinal] || 0) + 1;
-        statusPotensi[statusFinal] = (statusPotensi[statusFinal] || 0) + pot;
-    });
-
-    // Warna konsisten per status final
-    const colorMap = {
-        'terdaftar': '#0066cc',
-        'belum terdaftar': '#dc3545'
-    };
-
-    // Ambil semua label dari hasil hitung (maintain insertion order)
-    const rawLabels = Object.keys(statusCounts);
-
-    // Label yang ditampilkan
-    const displayLabels = rawLabels.map((l) => l === 'Terdaftar' ? 'Terdaftar' : l);
-
-    // Dataset: jumlah proyek per status
-    const values = rawLabels.map((l) => statusCounts[l] || 0);
-    const colors = rawLabels.map((l) => colorMap[l.toLowerCase()] || '#6c757d');
-
-    // Potensi iuran
-    const potensiValues = rawLabels.map((l) => statusPotensi[l] || 0);
-    const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
-
-    // destroy previous chart jika ada
-    try {
-        if (window.statusChart && typeof window.statusChart.destroy === 'function') {
-            window.statusChart.destroy();
-        }
-    } catch (e) { /* ignore */ }
-    window.statusChart = null;
-
-    const ctx = document.getElementById('statusChart').getContext('2d');
-
-    // register ChartDataLabels kalau tersedia dan belum ter-registrasi
-    if (typeof ChartDataLabels !== 'undefined') {
-        try {
-            // Chart.register idempotent — tidak error jika sudah ter-registrasi
-            Chart.register(ChartDataLabels);
-        } catch (e) { /* ignore */ }
-    }
-
-    // threshold relatif (terhadap max value) untuk memutuskan "di dalam" vs "di atas"
-    const maxValue = values.length ? Math.max(...values) : 0;
-    const thresholdRelative = 0.25; // ubah kalau mau lebih/kurang agresif
-
-    window.statusChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: displayLabels,
-            datasets: [
-                {
-                    data: values,
-                    backgroundColor: colors,
-                    borderWidth: 2,
-                    borderColor: 'var(--color-surface)',
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { display: false } },
-                y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function (ctx) {
-                            const idx = ctx.dataIndex;
-                            const count = ctx.raw;
-                            const pot = potensiValues[idx] || 0;
-                            const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
-
-                            return [
-                                `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
-                                `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`,
-                            ];
-                        },
-                    },
-                },
-                // config plugin datalabels
-                datalabels: {
-                    display: true,
-                    formatter: function(value, ctx) {
-                        const idx = ctx.dataIndex;
-                        const pot = potensiValues[idx] || 0;
-                        const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
-                        // tampilkan 2 baris: jumlah proyek (besar) lalu potensi (lebih kecil)
-                        return `${value.toLocaleString('id-ID')} proyek\n${formatCurrency(pot)} (${pct.toFixed(1)}%)`;
-                    },
-                    anchor: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        return val >= (maxValue * thresholdRelative) ? 'center' : 'end';
-                    },
-                    align: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        return val >= (maxValue * thresholdRelative) ? 'center' : 'start';
-                    },
-                    offset: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        return val >= (maxValue * thresholdRelative) ? 0 : -6;
-                    },
-                    color: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        return val >= (maxValue * thresholdRelative) ? '#ffffff' : '#111';
-                    },
-                    font: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        return {
-                            weight: '600',
-                            size: val >= (maxValue * thresholdRelative) ? 12 : 11,
-                        };
-                    },
-                    backgroundColor: function(ctx) {
-                        const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                        // kalau label ditempatkan di luar (di atas), beri background putih agar terbaca
-                        return val >= (maxValue * thresholdRelative) ? 'transparent' : 'rgba(255,255,255,0.9)';
-                    },
-                    borderRadius: 6,
-                    padding: { top: 6, bottom: 6, left: 8, right: 8 },
-                    lineHeight: 1.05,
-                    clamp: true
-                }
+            if (typeof computePotensiIuran !== 'function') {
+                window.computePotensiIuran = function(nilaiProyek) {
+                    return Number(nilaiProyek) ? Number(nilaiProyek) * 0.00127 : 0;
+                };
             }
-        },
-        plugins: (typeof ChartDataLabels !== 'undefined') ? [ChartDataLabels] : []
-    });
-}
+            if (typeof formatCurrency !== 'function') {
+                window.formatCurrency = function(num) {
+                    return (Number(num) || 0).toLocaleString('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        maximumFractionDigits: 0
+                    }).replace(',00', '');
+                };
+            }
 
+            const normalizeMapStatus = (s) => {
+                const x = String(s ?? '')
+                    .normalize('NFKC')
+                    .trim()
+                    .toUpperCase()
+                    .replace(/\s+/g, ' ');
 
+                if (
+                    x === 'BELUM TL' ||
+                    x === 'BELUM_TL' ||
+                    x === 'BELUM-TL' ||
+                    x === 'TIDAK VALID' ||
+                    x === 'TIDAK_VALID' ||
+                    x === 'VALID'
+                ) {
+                    return 'Belum Terdaftar';
+                }
+                if (x === 'TERDAFTAR') {
+                    return 'Terdaftar';
+                }
+
+                return x.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+            };
+
+            const statusCounts = {};
+            const statusPotensi = {};
+
+            (data || []).forEach((project) => {
+                const statusFinal = normalizeMapStatus(project.statusPotensi);
+                const nilai = Number(project.nilaiProyek) || 0;
+                const pot = computePotensiIuran(nilai);
+
+                statusCounts[statusFinal] = (statusCounts[statusFinal] || 0) + 1;
+                statusPotensi[statusFinal] = (statusPotensi[statusFinal] || 0) + pot;
+            });
+
+            const colorMap = {
+                'terdaftar': '#0066cc',
+                'belum terdaftar': '#dc3545'
+            };
+
+            const rawLabels = Object.keys(statusCounts);
+            const displayLabels = rawLabels.map((l) => l === 'Terdaftar' ? 'Terdaftar' : l);
+            const values = rawLabels.map((l) => statusCounts[l] || 0);
+            const colors = rawLabels.map((l) => colorMap[l.toLowerCase()] || '#6c757d');
+            const potensiValues = rawLabels.map((l) => statusPotensi[l] || 0);
+            const totalPotensiAll = potensiValues.reduce((a, b) => a + b, 0);
+
+            updateStatusChartDetails(rawLabels, values, potensiValues, totalPotensiAll);
+
+            try {
+                if (window.statusChart && typeof window.statusChart.destroy === 'function') {
+                    window.statusChart.destroy();
+                }
+            } catch (e) { /* ignore */ }
+            window.statusChart = null;
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            if (typeof ChartDataLabels !== 'undefined') {
+                try {
+                    Chart.register(ChartDataLabels);
+                } catch (e) { /* ignore */ }
+            }
+
+            const maxValue = values.length ? Math.max(...values) : 0;
+            const thresholdRelative = 0.25;
+
+            window.statusChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: displayLabels,
+                    datasets: [
+                        {
+                            data: values,
+                            backgroundColor: colors,
+                            borderWidth: 2,
+                            borderColor: 'var(--color-surface)',
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    const idx = ctx.dataIndex;
+                                    const count = ctx.raw;
+                                    const pot = potensiValues[idx] || 0;
+                                    const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
+
+                                    return [
+                                        `${displayLabels[idx]}: ${count.toLocaleString('id-ID')} proyek`,
+                                        `Potensi iuran: ${formatCurrency(pot)} (${pct.toFixed(1)}%)`,
+                                    ];
+                                },
+                            },
+                        },
+                        datalabels: {
+                            display: true,
+                            formatter: function(value, ctx) {
+                                const idx = ctx.dataIndex;
+                                const pot = potensiValues[idx] || 0;
+                                const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
+                                return `${value.toLocaleString('id-ID')} proyek\n${formatCurrency(pot)} (${pct.toFixed(1)}%)`;
+                            },
+                            anchor: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return val >= (maxValue * thresholdRelative) ? 'center' : 'end';
+                            },
+                            align: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return val >= (maxValue * thresholdRelative) ? 'center' : 'start';
+                            },
+                            offset: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return val >= (maxValue * thresholdRelative) ? 0 : -6;
+                            },
+                            color: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return val >= (maxValue * thresholdRelative) ? '#ffffff' : '#111';
+                            },
+                            font: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return {
+                                    weight: '600',
+                                    size: val >= (maxValue * thresholdRelative) ? 12 : 11,
+                                };
+                            },
+                            backgroundColor: function(ctx) {
+                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
+                                return val >= (maxValue * thresholdRelative) ? 'transparent' : 'rgba(255,255,255,0.9)';
+                            },
+                            borderRadius: 6,
+                            padding: { top: 6, bottom: 6, left: 8, right: 8 },
+                            lineHeight: 1.05,
+                            clamp: true
+                        }
+                    }
+                },
+                plugins: (typeof ChartDataLabels !== 'undefined') ? [ChartDataLabels] : []
+            });
+        }
+
+        function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
+            const detailsContainer = document.getElementById('statusChartDetails');
+            detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
+            
+            labels.forEach((label, index) => {
+                const count = values[index] || 0;
+                const potensi = potensiValues[index] || 0;
+                const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
+                
+                const detailItem = document.createElement('div');
+                
+                let itemClass = 'detail-item';
+                if (label.toLowerCase().includes('batal')) {
+                    itemClass += ' dark';
+                } else if (label.toLowerCase().includes('terdaftar')) {
+                    itemClass += ' blue';
+                } else if (label.toLowerCase().includes('belum')) {
+                    itemClass += ' red';
+                }
+                
+                detailItem.className = itemClass;
+                detailItem.innerHTML = `
+                    <div class="detail-content">
+                        <span class="detail-label">${label}</span>
+                        <div class="detail-values">
+                            <span class="detail-value">${count.toLocaleString('id-ID')}</span>
+                            <span class="detail-iuran">${formatCurrency(potensi)}</span>
+                            <span class="detail-percent">${pct.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+                detailsContainer.appendChild(detailItem);
+            });
+        }
 
         function updateSumberDanaChart(data) {
             const sumberDanaValues = {};
@@ -1003,8 +1245,10 @@
 
             const labels = Object.keys(sumberDanaValues);
             const values = Object.values(sumberDanaValues);
+            const totalValue = values.reduce((a, b) => a + b, 0);
 
-            // Palet warna (akan diulang kalau kategori > warna)
+            updateSumberDanaChartDetails(labels, values, totalValue);
+
             const baseColors = ['#004c99', '#0066cc', '#ffcc00', '#28a745', '#4BC0C0', '#ff9f40', '#dc3545', '#9966ff'];
             const colors = labels.map((_, i) => baseColors[i % baseColors.length]);
 
@@ -1028,6 +1272,25 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                precision: 0,
+                                callback: function(value) {
+                                    if (value >= 1000000000) {
+                                        return (value / 1000000000).toFixed(0) + 'B';
+                                    } else if (value >= 1000000) {
+                                        return (value / 1000000).toFixed(0) + 'M';
+                                    } else if (value >= 1000) {
+                                        return (value / 1000).toFixed(0) + 'K';
+                                    }
+                                    return value;
+                                }
+                            }
+                        }
+                    },
                     plugins: {
                         legend: {display:false },
                         tooltip: {
@@ -1045,6 +1308,30 @@
             });
         }
 
+        function updateSumberDanaChartDetails(labels, values, totalValue) {
+            const detailsContainer = document.getElementById('sumberDanaChartDetails');
+            detailsContainer.innerHTML = '<h4>Rincian Sumber Dana</h4>';
+            
+            labels.forEach((label, index) => {
+                const value = values[index] || 0;
+                const pct = totalValue ? (value / totalValue) * 100 : 0;
+                
+                const detailItem = document.createElement('div');
+                detailItem.className = 'detail-item blue';
+                
+                detailItem.innerHTML = `
+                    <div class="detail-content">
+                        <span class="detail-label">${label}</span>
+                        <div class="detail-values">
+                            <span class="detail-value">${formatCurrency(value)}</span>
+                            <span class="detail-percent">${pct.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+                detailsContainer.appendChild(detailItem);
+            });
+        }
+
         function updateMainTable(data) {
             const instansiCounts = {};
             const instansiValues = {};
@@ -1058,7 +1345,7 @@
             const sortedInstansi = Object.keys(instansiCounts).sort((a, b) => instansiCounts[b] - instansiCounts[a]);
             const mainTableBody = document.getElementById('mainTableBody');
             mainTableBody.innerHTML = '';
-            console.log(sortedInstansi)
+            
             sortedInstansi.forEach((instansi, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -1077,14 +1364,12 @@
             });
         }
 
-        /* FUNGSI INI DIUBAH TOTAL UNTUK MENYESUAIKAN FORMAT DI GAMBAR */
         function updateCurrentDate() {
             const now = new Date();
             
-            // Menggunakan Intl.DateTimeFormat untuk memastikan format yang konsisten
             const formatter = new Intl.DateTimeFormat('id-ID', {
                 day: '2-digit', 
-                month: 'short', // 'Oct', 'Sep', dll.
+                month: 'short',
                 year: 'numeric',
                 hour: '2-digit', 
                 minute: '2-digit',
@@ -1093,23 +1378,21 @@
                 timeZone: 'Asia/Jakarta'
             });
             
-            // Format mentah: "06 Okt 2025 10.23.56"
             let formatted = formatter.format(now);
             
-            // Konversi nama bulan ID ke Inggris singkat (Okt -> Oct) dan ganti pemisah waktu
             formatted = formatted
-                .replace('Okt', 'Oct') // Oktober ke Oct
-                .replace('Sep', 'Sep') // September ke Sep
-                .replace('Agu', 'Aug') // Agustus ke Aug
-                .replace('Jul', 'Jul') // Juli ke Jul
-                .replace('Jun', 'Jun') // Juni ke Jun
-                .replace('Mei', 'May') // Mei ke May
-                .replace('Apr', 'Apr') // April ke Apr
-                .replace('Mar', 'Mar') // Maret ke Mar
-                .replace('Feb', 'Feb') // Februari ke Feb
-                .replace('Jan', 'Jan') // Januari ke Jan
-                .replace(/\./g, ':') // Mengganti titik pemisah jam (jika ada)
-                .replace(/\s\s+/g, ' '); // Menghilangkan spasi ganda
+                .replace('Okt', 'Oct')
+                .replace('Sep', 'Sep')
+                .replace('Agu', 'Aug')
+                .replace('Jul', 'Jul')
+                .replace('Jun', 'Jun')
+                .replace('Mei', 'May')
+                .replace('Apr', 'Apr')
+                .replace('Mar', 'Mar')
+                .replace('Feb', 'Feb')
+                .replace('Jan', 'Jan')
+                .replace(/\./g, ':')
+                .replace(/\s\s+/g, ' ');
 
             const finalString = `Update data per tgl. ${formatted}`;
             
@@ -1137,7 +1420,6 @@
             `;
             document.body.appendChild(errorDiv);
             
-            // Auto remove after 5 seconds
             setTimeout(() => {
                 if (errorDiv.parentElement) {
                     errorDiv.remove();
@@ -1176,7 +1458,6 @@
             }
         }
 
-        // Function to manually refresh data - NOTIFIKASI BERHASIL DIHILANGKAN
         function refreshData() {
             updateConnectionStatus('loading', 'Memuat ulang...');
             
@@ -1184,7 +1465,6 @@
                 .then(data => {
                     if (data && data.length > 0) {
                         updateDashboard(data);
-                        // Status koneksi di-update, tapi pop-up sukses dihilangkan
                         updateConnectionStatus('online', `${data.length} data berhasil dimuat`);
                         console.log(`✅ Data refreshed successfully: ${data.length} records`);
                     } else {
@@ -1198,32 +1478,11 @@
                 });
         }
 
-        // Auto-refresh every 5 minutes
         setInterval(() => {
             console.log("🔄 Auto-refreshing data...");
             refreshData();
         }, 5 * 60 * 1000);
 
-        async function getSheetInfo() {
-            const sheetId = SHEET_CONFIG.sheetId;
-            const apiKey = SHEET_CONFIG.apiKey;
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
-            
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                console.log("📊 Available sheets:", data.sheets?.map(s => s.properties.title));
-                return data.sheets;
-            } catch (error) {
-                console.error("Error getting sheet info:", error);
-                return null;
-            }
-        }
-
-        function syncPanelsWidth() { /* Fungsi ini dinonaktifkan karena layout grid baru */ }
-
-        // window.addEventListener('load',  syncPanelsWidth);
-        // window.addEventListener('resize', syncPanelsWidth);
     </script>
 </body>
 </html>
