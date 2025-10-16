@@ -1203,24 +1203,36 @@
         function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
             const detailsContainer = document.getElementById('statusChartDetails');
             detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
-            
+
+            // helper lokal: ambil canonical key dari label yang ditampilkan
+            const toCanonical = (label) => {
+                if (!label) return '';
+                const x = String(label).toLowerCase();
+                if (x.includes('batal')) return 'batal';
+                if (x.includes('terdaftar')) return 'terdaftar';
+                if (x.includes('belum')) return 'belum';
+                // fallback: jika label mengandung kata kunci lain:
+                if (x.includes('valid') || x.includes('tidak_valid') || x.includes('belum tl')) return 'belum';
+                return x.replace(/\s+/g,''); // fallback simple
+            };
+
             labels.forEach((label, index) => {
                 const count = values[index] || 0;
                 const potensi = potensiValues[index] || 0;
                 const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
-                
+
+                const canonical = toCanonical(label);
+
                 const detailItem = document.createElement('div');
-                
                 let itemClass = 'detail-item';
-                if (label.toLowerCase().includes('batal')) {
-                    itemClass += ' dark';
-                } else if (label.toLowerCase().includes('terdaftar')) {
-                    itemClass += ' blue';
-                } else if (label.toLowerCase().includes('belum')) {
-                    itemClass += ' red';
-                }
-                
+                if (canonical === 'batal') itemClass += ' dark';
+                else if (canonical === 'terdaftar') itemClass += ' blue';
+                else if (canonical === 'belum') itemClass += ' red';
+
                 detailItem.className = itemClass;
+                detailItem.setAttribute('data-status', canonical);
+                detailItem.style.cursor = 'pointer';
+
                 detailItem.innerHTML = `
                     <div class="detail-content">
                         <span class="detail-label">${label}</span>
@@ -1231,9 +1243,17 @@
                         </div>
                     </div>
                 `;
+
+                detailItem.addEventListener('click', () => {
+                    // pakai nama file target yang konsisten (mis: detail-status.html)
+                    window.location.href = `detail-status.html?status=${encodeURIComponent(canonical)}`;
+                });
+
                 detailsContainer.appendChild(detailItem);
             });
         }
+
+
 
         function updateSumberDanaChart(data) {
             const sumberDanaValues = {};
