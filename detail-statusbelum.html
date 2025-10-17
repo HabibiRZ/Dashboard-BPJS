@@ -1223,7 +1223,7 @@
     if (elPotensi) elPotensi.textContent = formatCurrency(potensi);
   }
 
-  // ======================== RENDER DETAIL TABLE (REPLACE THIS WHOLE FUNCTION) ========================
+  // ======================== RENDER DETAIL TABLE (REPLACE WITH THIS) ========================
 function updateDetailTable(data) {
   originalDetailData = data.slice();
   const tableBody = document.getElementById('tableBody');
@@ -1268,7 +1268,7 @@ function updateDetailTable(data) {
       </span>
     `;
 
-    // Semua nama proyek dibuat sebagai link, namun dataset-status berisi canonical status
+    // Semua nama proyek dibuat sebagai link agar konsisten; dataset-status berisi canonical
     const safeName = escapeHtml(project.namaProyek);
     const encodedName = encodeURIComponent(project.namaProyek || '');
     const encodedInstansi = encodeURIComponent(project.namaInstansi || '');
@@ -1320,6 +1320,7 @@ function updateDetailTable(data) {
   updateRowsCount(data.length, data.length);
 }
 
+
 // ======================== CLICK HANDLER (REPLACE EXISTING HANDLER) ========================
 document.getElementById('tableBody')?.addEventListener('click', (e) => {
   const anchor = e.target.closest('.project-link');
@@ -1327,21 +1328,29 @@ document.getElementById('tableBody')?.addEventListener('click', (e) => {
   e.preventDefault();
 
   const namaEncoded = anchor.dataset.proyek || '';
-  const nama = decodeURIComponent(namaEncoded);
+  const nama = decodeURIComponent(namaEncoded || '');
   const status = (anchor.dataset.status || '').toLowerCase(); // 'belum', 'terdaftar', 'batal', ...
   const instansi = decodeURIComponent(anchor.dataset.instansi || '');
 
-  // jika status === 'belum' -> arahkan ke detail-status?status=belum
-  // jika status !== 'belum' -> tetap arahkan ke detail-status?status=<status>
-  // sertakan proyek dan instansi sebagai query parameter supaya detail-status bisa membaca konteks
+  // Paths — sesuaikan jika kamu pake nama file/route berbeda
+  const targetBelumPath = '/detail-status-belum.html'; // file khusus untuk status 'belum'
+  const targetOtherPath = '/detail-status.html';       // file umum untuk status lain
+
   const params = new URLSearchParams();
-  if (status) params.set('status', status);
   if (nama) params.set('proyek', nama);
   if (instansi) params.set('instansi', instansi);
 
-  // Ganti path jika ingin pakai halaman lain, mis. '/detail-status.html'
-  const targetPath = '/detail-status'; // <-- ubah jika diperlukan
-  window.location.href = targetPath + '?' + params.toString();
+  // Jika proyek berstatus 'belum', buka file khusus; selain itu buka file umum dengan status param
+  if (status === 'belum') {
+    // untuk halaman khusus belum, tetap kirim status=belum supaya konsisten
+    params.set('status', 'belum');
+    window.location.href = targetBelumPath + '?' + params.toString();
+    return;
+  }
+
+  // status lain -> buka halaman umum dan sertakan status canonical
+  if (status) params.set('status', status);
+  window.location.href = targetOtherPath + '?' + params.toString();
 });
 
 

@@ -1200,58 +1200,85 @@
             });
         }
 
-        function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
-            const detailsContainer = document.getElementById('statusChartDetails');
-            detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
+       function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
+  const detailsContainer = document.getElementById('statusChartDetails');
+  if (!detailsContainer) {
+    console.error('Element #statusChartDetails tidak ditemukan.');
+    return;
+  }
+  detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
 
-            // helper lokal: ambil canonical key dari label yang ditampilkan
-            const toCanonical = (label) => {
-                if (!label) return '';
-                const x = String(label).toLowerCase();
-                if (x.includes('batal')) return 'batal';
-                if (x.includes('terdaftar')) return 'terdaftar';
-                if (x.includes('belum')) return 'belum';
-                // fallback: jika label mengandung kata kunci lain:
-                if (x.includes('valid') || x.includes('tidak_valid') || x.includes('belum tl')) return 'belum';
-                return x.replace(/\s+/g,''); // fallback simple
-            };
+  const normalizeLabel = (label) => {
+    if (!label) return '';
+    return String(label).trim().toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ');
+  };
 
-            labels.forEach((label, index) => {
-                const count = values[index] || 0;
-                const potensi = potensiValues[index] || 0;
-                const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
+  const toCanonical = (label) => {
+    const x = normalizeLabel(label);
+    if (!x) return '';
+    if (x.includes('batal')) return 'batal';
+    if (x.includes('terdaftar') && !x.includes('belum')) return 'terdaftar';
+    // tangani varian seperti "belum terdaftar", "belum tl", "belum_tl", "valid"/"tidak_valid" => anggap 'belum'
+    if (x.includes('belum') || x.includes('valid') || x.includes('tidak valid') || x.includes('tidak_valid') || x.includes('belum tl') || x.includes('belum_tl')) return 'belum';
+    return x.replace(/\s+/g, '');
+  };
 
-                const canonical = toCanonical(label);
+  // Tentukan path target (sesuaikan kalau nama file/folder berbeda)
+  const targetBelumPath = '/detail-statusbelum.html'; // <-- pastikan file ini benar
+  const targetOtherPath = '/detail-status.html';      // <-- dan ini juga
 
-                const detailItem = document.createElement('div');
-                let itemClass = 'detail-item';
-                if (canonical === 'batal') itemClass += ' dark';
-                else if (canonical === 'terdaftar') itemClass += ' blue';
-                else if (canonical === 'belum') itemClass += ' red';
+  labels.forEach((label, index) => {
+    const count = values[index] || 0;
+    const potensi = potensiValues[index] || 0;
+    const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
 
-                detailItem.className = itemClass;
-                detailItem.setAttribute('data-status', canonical);
-                detailItem.style.cursor = 'pointer';
+    const canonical = toCanonical(label) || 'unknown';
+    const normalizedLabel = normalizeLabel(label);
 
-                detailItem.innerHTML = `
-                    <div class="detail-content">
-                        <span class="detail-label">${label}</span>
-                        <div class="detail-values">
-                            <span class="detail-value">${count.toLocaleString('id-ID')}</span>
-                            <span class="detail-iuran">${formatCurrency(potensi)}</span>
-                            <span class="detail-percent">${pct.toFixed(1)}%</span>
-                        </div>
-                    </div>
-                `;
+    const detailItem = document.createElement('div');
 
-                detailItem.addEventListener('click', () => {
-                    // pakai nama file target yang konsisten (mis: detail-status.html)
-                    window.location.href = `detail-status.html?status=${encodeURIComponent(canonical)}`;
-                });
+    let itemClass = 'detail-item';
+    if (canonical === 'batal') itemClass += ' dark';
+    else if (canonical === 'terdaftar') itemClass += ' blue';
+    else if (canonical === 'belum') itemClass += ' red belum-terdaftar';
 
-                detailsContainer.appendChild(detailItem);
-            });
-        }
+    detailItem.className = itemClass;
+    detailItem.setAttribute('data-status', canonical);
+    detailItem.style.cursor = 'pointer';
+
+    detailItem.innerHTML = `
+      <div class="detail-content">
+        <span class="detail-label">${label}</span>
+        <div class="detail-values">
+          <span class="detail-value">${count.toLocaleString('id-ID')}</span>
+          <span class="detail-iuran">${formatCurrency(potensi)}</span>
+          <span class="detail-percent">${pct.toFixed(1)}%</span>
+        </div>
+      </div>
+    `;
+
+    detailItem.addEventListener('click', (ev) => {
+      // debug log — hapus nanti kalau sudah beres
+      console.log('clicked status detail:', { label, index, canonical });
+
+      // Jika canonical 'belum' (termasuk varian 'belum terdaftar' dll) -> buka halaman khusus
+      if (canonical === 'belum' || normalizedLabel === 'belum terdaftar') {
+        const url = `${location.origin}${targetBelumPath}?status=${encodeURIComponent(canonical)}&label=${encodeURIComponent(label)}`;
+        window.location.assign(url);
+        return;
+      }
+
+      // default: buka halaman umum dan kirim status canonical
+      const urlOther = `${location.origin}${targetOtherPath}?status=${encodeURIComponent(canonical)}&label=${encodeURIComponent(label)}`;
+      window.location.assign(urlOther);
+    });
+
+    detailsContainer.appendChild(detailItem);
+  });
+}
+
+
+
 
 
 
