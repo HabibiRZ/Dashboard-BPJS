@@ -54,24 +54,60 @@
         }
 
         header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: var(--color-surface);
-            padding: 5px 0; 
-            border-bottom: 1px solid #e0e0e0; 
-        }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-surface);
+    padding: 5px 0;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+}
 
-        .header-section {
-            display: flex;
-            align-items: center;
-        }
+.header-section {
+    display: flex;
+    align-items: center;
+    flex: 1; /* Biar seimbang */
+}
 
-        .header-logo {
-            height: 70px;
-            margin-right: 8px;
-            border-radius: 6px;
-        }
+.header-section:last-child {
+    justify-content: flex-end;
+}
+
+.header-logo {
+    height: 60px; /* Diperkecil dari 70px */
+    margin-right: 8px;
+    border-radius: 6px;
+}
+
+/* Logo Medan Untuk Semua yang lebih kecil */
+.header-logo-small {
+    height: 45px; /* Lebih kecil dari logo lainnya */
+    width: auto;
+    margin-right: 8px;
+    border-radius: 6px;
+}
+
+.header-title {
+    text-align: center;
+    flex-grow: 1;
+    flex: 2; /* Lebih lebar agar judul benar-benar di tengah */
+}
+
+.header-title h1 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-bottom: 3px;
+    line-height: 1.2;
+}
+
+.header-title p {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #000000;
+    font-style: italic;
+    margin: 0;
+}
             
         .header-logo:last-of-type {
             margin-right: 0;
@@ -759,7 +795,7 @@
             </div>
 
             <div class="header-section">
-                <img src="mdnsemua.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">
+                <img src="mdnsemua.png" alt="Medan Untuk Semua" class="header-logo-small">
                 <img src="logo.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">    
             </div>
         </header>
@@ -774,7 +810,7 @@
                 <a href="topworst.html" class="nav-button">Top & Worst</a>
             </div>
             <div class="top-bar-right" style="display: flex; align-items: center;">
-                <img src="sumut-berkah.png" alt="Medan" class="header-person" style="margin-left: 5px;">
+                <img src="semua2.png" alt="Medan" class="header-person" style="margin-left: 5px;">
             </div>
         </div>
 
@@ -1201,87 +1237,40 @@
             });
         }
 
-       function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
-  const detailsContainer = document.getElementById('statusChartDetails');
-  if (!detailsContainer) {
-    console.error('Element #statusChartDetails tidak ditemukan.');
-    return;
-  }
-  detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
-
-  const normalizeLabel = (label) => {
-    if (!label) return '';
-    return String(label).trim().toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ');
-  };
-
-  const toCanonical = (label) => {
-    const x = normalizeLabel(label);
-    if (!x) return '';
-    if (x.includes('batal')) return 'batal';
-    if (x.includes('terdaftar') && !x.includes('belum')) return 'terdaftar';
-    // tangani varian seperti "belum terdaftar", "belum tl", "belum_tl", "valid"/"tidak_valid" => anggap 'belum'
-    if (x.includes('belum') || x.includes('valid') || x.includes('tidak valid') || x.includes('tidak_valid') || x.includes('belum tl') || x.includes('belum_tl')) return 'belum';
-    return x.replace(/\s+/g, '');
-  };
-
-  // Tentukan path target (sesuaikan kalau nama file/folder berbeda)
-  const targetBelumPath = '/detail-statusbelum.html'; // <-- pastikan file ini benar
-  const targetOtherPath = '/detail-status.html';      // <-- dan ini juga
-
-  labels.forEach((label, index) => {
-    const count = values[index] || 0;
-    const potensi = potensiValues[index] || 0;
-    const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
-
-    const canonical = toCanonical(label) || 'unknown';
-    const normalizedLabel = normalizeLabel(label);
-
-    const detailItem = document.createElement('div');
-
-    let itemClass = 'detail-item';
-    if (canonical === 'batal') itemClass += ' dark';
-    else if (canonical === 'terdaftar') itemClass += ' blue';
-    else if (canonical === 'belum') itemClass += ' red belum-terdaftar';
-
-    detailItem.className = itemClass;
-    detailItem.setAttribute('data-status', canonical);
-    detailItem.style.cursor = 'pointer';
-
-    detailItem.innerHTML = `
-      <div class="detail-content">
-        <span class="detail-label">${label}</span>
-        <div class="detail-values">
-          <span class="detail-value">${count.toLocaleString('id-ID')}</span>
-          <span class="detail-iuran">${formatCurrency(potensi)}</span>
-          <span class="detail-percent">${pct.toFixed(1)}%</span>
-        </div>
-      </div>
-    `;
-
-    detailItem.addEventListener('click', (ev) => {
-      // debug log — hapus nanti kalau sudah beres
-      console.log('clicked status detail:', { label, index, canonical });
-
-      // Jika canonical 'belum' (termasuk varian 'belum terdaftar' dll) -> buka halaman khusus
-      if (canonical === 'belum' || normalizedLabel === 'belum terdaftar') {
-        const url = `${location.origin}${targetBelumPath}?status=${encodeURIComponent(canonical)}&label=${encodeURIComponent(label)}`;
-        window.location.assign(url);
-        return;
-      }
-
-      // default: buka halaman umum dan kirim status canonical
-      const urlOther = `${location.origin}${targetOtherPath}?status=${encodeURIComponent(canonical)}&label=${encodeURIComponent(label)}`;
-      window.location.assign(urlOther);
-    });
-
-    detailsContainer.appendChild(detailItem);
-  });
-}
-
-
-
-
-
+        function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
+            const detailsContainer = document.getElementById('statusChartDetails');
+            detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
+            
+            labels.forEach((label, index) => {
+                const count = values[index] || 0;
+                const potensi = potensiValues[index] || 0;
+                const pct = totalPotensiAll ? (potensi / totalPotensiAll) * 100 : 0;
+                
+                const detailItem = document.createElement('div');
+                
+                let itemClass = 'detail-item';
+                if (label.toLowerCase().includes('batal')) {
+                    itemClass += ' dark';
+                } else if (label.toLowerCase().includes('terdaftar')) {
+                    itemClass += ' blue';
+                } else if (label.toLowerCase().includes('belum')) {
+                    itemClass += ' red';
+                }
+                
+                detailItem.className = itemClass;
+                detailItem.innerHTML = `
+                    <div class="detail-content">
+                        <span class="detail-label">${label}</span>
+                        <div class="detail-values">
+                            <span class="detail-value">${count.toLocaleString('id-ID')}</span>
+                            <span class="detail-iuran">${formatCurrency(potensi)}</span>
+                            <span class="detail-percent">${pct.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+                detailsContainer.appendChild(detailItem);
+            });
+        }
 
         function updateSumberDanaChart(data) {
             const sumberDanaValues = {};
