@@ -605,6 +605,27 @@
             line-height: 1.4;
         }
 
+        .main-footer {
+            display: flex;
+            justify-content: space-between; /* Tombol kiri, teks kanan */
+            align-items: center;
+        }
+
+        .footer-button {
+            padding: 8px 14px;
+            background-color: #0a4d2e; /* Hijau tua */
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .footer-button:hover {
+            background-color: #063520;
+        }
+
+
+
         /* ================== Media Queries untuk Responsif ================== */
         @media (max-width: 900px) {
             .dashboard {
@@ -888,7 +909,8 @@
             </div>    
         </div>
         <footer class="main-footer">
-        <p class="footer-text">BPJS Ketenagakerjaan Kantor Cabang Medan Kota</p>
+            <a href="https://docs.google.com/spreadsheets/d/1ky92mACIpm11IRHr6qzqaEPXdsIMZsunmUSaSbRcdvY/edit?gid=0#gid=0" target="_blank" class="footer-button">Lihat Data</a>
+            <p class="footer-text">BPJS Ketenagakerjaan Kantor Cabang Medan Kota</p>
         </footer>
     </div>
 
