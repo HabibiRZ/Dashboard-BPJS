@@ -545,7 +545,7 @@
 
     <script>
 // ======================== GLOBAL VARIABLES & CONFIG ========================
-let originalDetailData = [];
+let originalDetailData = []; // Data awal yang sudah difilter berdasarkan URL
 let searchInitialized = false;
 let statusChart = null;
 let currentInstansi = null;
@@ -741,8 +741,8 @@ function updateStatusChart(data) {
     });
 
     const colorMap = {
-        'terdaftar': '#004c99', 
-        'belum terdaftar': '#e74c3c' 
+        'terdaftar': '#2ecc71', // Menggunakan warna Terdaftar dari CSS: #2ecc71
+        'belum terdaftar': '#e74c3c' // Menggunakan warna Belum Terdaftar dari CSS: #e74c3c
     };
 
     const rawLabels = Object.keys(statusCounts);
@@ -800,23 +800,21 @@ function updateStatusChart(data) {
 
 // ======================== RENDER DETAIL TABLE ========================
 function updateDetailTable(data) {
-    originalDetailData = data.slice(); // PERBAIKAN: Simpan data yang sudah difilter
-    
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = '';
     
     if (!data || data.length === 0) {
         const row = document.createElement('tr');
-        // Colspan diatur ke 8 (jumlah kolom setelah 'No.')
+        // Colspan diatur ke 8 (jumlah kolom)
         row.innerHTML = `<td colspan="8" style="text-align:center; color:#666; padding:18px; border-bottom: none;">
             <i class="fas fa-box-open" style="margin-right: 8px;"></i> Tidak ada data yang cocok dengan pencarian.
         </td>`;
         tableBody.appendChild(row);
-        updateRowsCount(0, originalDetailData.length);
+        // updateRowsCount dipanggil di runFilter, tidak perlu di sini
         return;
     }
 
-    data.forEach((project, idx) => { // PERBAIKAN: Tambahkan index untuk nomor urut
+    data.forEach((project, idx) => { 
         const row = document.createElement('tr');
         const statusLabel = normalizeMapStatus(project.statusPotensi);
         const statusCanonical = projectStatusToCanonical(project);
@@ -865,24 +863,33 @@ function updateDetailTable(data) {
         tableBody.appendChild(row);
     });
     
-    updateRowsCount(data.length, data.length); // PERBAIKAN: Update row count
+    // updateRowsCount dipanggil di runFilter, tidak perlu di sini
 }
 
 // ======================== SEARCH SETUP & DEBOUNCE ========================
 function setupTableSearch() {
     const input = document.getElementById('tableSearch');
     const applyBox = document.getElementById('applyToCharts');
-    if (!input || searchInitialized) {
+    
+    if (!input) {
         updateRowsCount(originalDetailData.length, originalDetailData.length);
         return;
     }
+
+    if (searchInitialized) {
+        // Jika sudah diinisialisasi, jalankan filter lagi jika dipanggil
+        runFilter(); 
+        return;
+    }
+    
     searchInitialized = true;
 
     const runFilter = () => {
         const q = (input.value || '').trim().toLowerCase();
-        let filtered = originalDetailData.slice();
+        let filtered = originalDetailData.slice(); // Selalu mulai dari data original
 
         if (q) {
+            // Jika ada query, lakukan filter
             const tokens = q.split(/\s+/);
             filtered = filtered.filter(p => {
                 const hay = [
@@ -893,13 +900,19 @@ function setupTableSearch() {
                 return tokens.every(t => hay.includes(t));
             });
         }
+        // Jika q kosong, filtered akan berisi originalDetailData.slice()
 
         updateDetailTable(filtered);
         updateRowsCount(filtered.length, originalDetailData.length);
 
         if (applyBox?.checked) {
+            // Terapkan filter ke ringkasan/grafik
             updateSummaryCards(filtered);
             updateCharts(filtered);
+        } else {
+            // Jika tidak dicentang, kembalikan ringkasan/grafik ke data awal
+            updateSummaryCards(originalDetailData);
+            updateCharts(originalDetailData);
         }
     };
 
@@ -920,7 +933,7 @@ function debounce(fn, delay = 300) {
 
 function updateRowsCount(showing, total) {
     const el = document.getElementById('rowsCount');
-    const totalDisp = originalDetailData.length.toLocaleString('id-ID');
+    const totalDisp = total.toLocaleString('id-ID');
     if (el) el.textContent = `Menampilkan ${showing.toLocaleString('id-ID')} dari ${totalDisp}`;
 }
 
@@ -950,27 +963,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         let filtered = allData.slice();
         
-        // Debug: Tampilkan data yang diambil
-        console.log("Total data dari Google Sheets:", allData.length);
-        console.log("Parameter URL - Instansi:", currentInstansi, "Status:", currentStatusParam);
-        
+        // Terapkan filter dari URL (Instansi dan Status)
         if (currentInstansi) {
             filtered = filterByInstansiName(filtered, currentInstansi);
-            console.log("Data setelah filter instansi:", filtered.length);
         }
         if (currentStatusParam) {
             filtered = filterByStatusCanonical(filtered, currentStatusParam);
-            console.log("Data setelah filter status:", filtered.length);
         }
 
-        // PERBAIKAN: Simpan data yang sudah difilter ke originalDetailData
+        // Simpan data yang sudah difilter dari URL ke originalDetailData
         originalDetailData = filtered;
 
-        updateSummaryCards(filtered);
-        updateCharts(filtered);
-        updateDetailTable(filtered);
-        setupTableSearch();
-
+        // Inisialisasi tampilan awal dengan data yang sudah difilter URL
+        updateSummaryCards(originalDetailData);
+        updateCharts(originalDetailData);
+        setupTableSearch(); // Akan memanggil runFilter() pertama kali untuk merender tabel
+        
     } catch (error) {
         console.error("❌ Error loading data:", error);
         showError("Gagal memuat data dari Google Sheets. Silakan coba lagi.");
@@ -991,20 +999,23 @@ document.getElementById('tableBody')?.addEventListener('click', (e) => {
 
     // Untuk demo/fokus summary:
     const subset = originalDetailData.filter(p => (p.namaProyek || '').toLowerCase() === nama.toLowerCase());
+    
+    // Perilaku demo ini mungkin perlu disesuaikan dengan kebutuhan navigasi sebenarnya.
     updateSummaryCards(subset);
     if (document.getElementById('applyToCharts')?.checked) {
         updateCharts(subset);
     }
+    
     document.getElementById('rowsCount').textContent = `Menampilkan ${subset.length.toLocaleString('id-ID')} dari ${originalDetailData.length.toLocaleString('id-ID')} • Ringkasan: ${nama}`;
     e.preventDefault();
     
-    /* REDIRECT LOGIC DIBIARKAN DI JS ANDA SEBELUMNYA */
-    const params = new URLSearchParams();
-    if (status) params.set('status', status);
-    if (nama) params.set('proyek', nama);
-    if (instansi) params.set('instansi', instansi);
-    const targetPath = '/detail-status';
-    window.location.href = targetPath + '?' + params.toString();
+    /* REDIRECT LOGIC */
+    // const params = new URLSearchParams();
+    // if (status) params.set('status', status);
+    // if (nama) params.set('proyek', nama);
+    // if (instansi) params.set('instansi', instansi);
+    // const targetPath = '/detail-status';
+    // window.location.href = targetPath + '?' + params.toString();
 });
 
 // ======================== LOADER & ERROR UI ========================
