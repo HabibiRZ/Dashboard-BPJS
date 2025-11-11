@@ -1271,25 +1271,34 @@
                 const detailItem = document.createElement('div');
                 
                 let itemClass = 'detail-item';
-                if (label.toLowerCase().includes('batal')) {
-                    itemClass += ' dark';
-                } else if (label.toLowerCase().includes('terdaftar')) {
-                    itemClass += ' blue';
-                } else if (label.toLowerCase().includes('belum')) {
-                    itemClass += ' red';
-                }
+                let detailLink = '#';
+                if (label.toLowerCase() === 'terdaftar' || label.toLowerCase().includes('batal')) {
+            itemClass += label.toLowerCase().includes('batal') ? ' dark' : ' blue';
+            // Link ke detail-status.html untuk Terdaftar dan Batal
+            detailLink = `detail-status.html?status=${encodeURIComponent(label)}`; 
+        } else if (label.toLowerCase().includes('belum')) {
+            itemClass += ' red';
+            // Link ke detail-statusbelum.html untuk Belum Terdaftar
+            detailLink = `detail-statusbelum.html?status=${encodeURIComponent(label)}`; 
+        }
+
+        const linkWrapper = document.createElement('a');
+        linkWrapper.href = detailLink;
+        linkWrapper.style.textDecoration = 'none'; // Menghilangkan garis bawah link
+        linkWrapper.style.color = 'inherit'; // Menggunakan warna teks bawaan
                 
                 detailItem.className = itemClass;
-                detailItem.innerHTML = `
-                    <div class="detail-content">
-                        <span class="detail-label">${label}</span>
-                        <div class="detail-values">
-                            <span class="detail-value">${count.toLocaleString('id-ID')}</span>
-                            <span class="detail-iuran">${formatCurrency(potensi)}</span>
-                            <span class="detail-percent">${pct.toFixed(1)}%</span>
-                        </div>
-                    </div>
-                `;
+        detailItem.innerHTML = `
+            <div class="detail-content">
+                <span class="detail-label">${label}</span>
+                <div class="detail-values">
+                    <span class="detail-value">${count.toLocaleString('id-ID')}</span>
+                    <span class="detail-iuran">${formatCurrency(potensi)}</span>
+                    <span class="detail-percent">${pct.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+        linkWrapper.appendChild(detailItem);
                 detailsContainer.appendChild(detailItem);
             });
         }
