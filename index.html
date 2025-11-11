@@ -54,60 +54,60 @@
         }
 
         header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: var(--color-surface);
-    padding: 5px 0;
-    border-bottom: 1px solid #e0e0e0;
-    position: relative;
-}
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--color-surface);
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
 
-.header-section {
-    display: flex;
-    align-items: center;
-    flex: 1; /* Biar seimbang */
-}
+        .header-section {
+            display: flex;
+            align-items: center;
+            flex: 1; /* Biar seimbang */
+        }
 
-.header-section:last-child {
-    justify-content: flex-end;
-}
+        .header-section:last-child {
+            justify-content: flex-end;
+        }
 
-.header-logo {
-    height: 60px; /* Diperkecil dari 70px */
-    margin-right: 8px;
-    border-radius: 6px;
-}
+        .header-logo {
+            height: 60px; /* Diperkecil dari 70px */
+            margin-right: 8px;
+            border-radius: 6px;
+        }
 
-/* Logo Medan Untuk Semua yang lebih kecil */
-.header-logo-small {
-    height: 45px; /* Lebih kecil dari logo lainnya */
-    width: auto;
-    margin-right: 8px;
-    border-radius: 6px;
-}
+        /* Logo Medan Untuk Semua yang lebih kecil */
+        .header-logo-small {
+            height: 45px; /* Lebih kecil dari logo lainnya */
+            width: auto;
+            margin-right: 8px;
+            border-radius: 6px;
+        }
 
-.header-title {
-    text-align: center;
-    flex-grow: 1;
-    flex: 2; /* Lebih lebar agar judul benar-benar di tengah */
-}
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+            flex: 2; /* Lebih lebar agar judul benar-benar di tengah */
+        }
 
-.header-title h1 {
-    font-size: 1.1rem;
-    color: var(--color-primary);
-    font-weight: 700;
-    margin-bottom: 3px;
-    line-height: 1.2;
-}
+        .header-title h1 {
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
 
-.header-title p {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #000000;
-    font-style: italic;
-    margin: 0;
-}
+        .header-title p {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #000000;
+            font-style: italic;
+            margin: 0;
+        }
             
         .header-logo:last-of-type {
             margin-right: 0;
@@ -222,7 +222,6 @@
             grid-template-rows: auto 1fr; 
             gap: 5px 10px; 
             flex-grow: 1;
-            height: calc(100vh - 200px);
             padding-bottom: 0; 
             overflow: hidden;
         }
@@ -372,7 +371,7 @@
             min-width: 0; /* Penting untuk mencegah overflow */
         }
 
-        /* Panel rincian - IMPROVED */
+        /* Panel rincian */
         .chart-details {
             width: 300px;
             border-radius: 12px;
@@ -381,7 +380,6 @@
             border: 1px solid #e1e5e9;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             font-size: 0.8rem;
-            overflow-y: auto;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -413,11 +411,18 @@
             border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
             min-height: 50px;
+            cursor: pointer; /* Agar terlihat clickable */
         }
 
         .detail-item:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .detail-item a { /* Memastikan link di dalam item tidak merusak layout */
+            text-decoration: none;
+            color: inherit;
+            display: contents; 
         }
 
         /* Warna border kiri sesuai kategori */
@@ -689,37 +694,38 @@
             }
             
              .chart-details {
-        width: 40%; /* Lebar lebih kecil untuk mobile */
-        height: auto;
-        order: 2; /* Tetap di posisi 2 (kanan) */
-        max-height: none; /* Hapus max-height */
-    }
-    
-    .chart-wrapper {
-        width: 60%; /* Chart lebih lebar */
-        order: 1; /* Tetap di posisi 1 (kiri) */
-        height: 250px; /* Tinggi tetap */
-        min-height: 250px;
-    }
-    
-    .detail-item {
-        padding: 8px 10px; /* Padding lebih kecil */
-        min-height: 40px; /* Tinggi lebih kecil */
-    }
-    
-    .detail-label {
-        font-size: 0.75rem; /* Font lebih kecil */
-    }
-    
-    .detail-value {
-        font-size: 0.8rem;
-    }
-    
-    .detail-iuran,
-    .detail-percent {
-        font-size: 0.7rem; /* Font lebih kecil untuk iuran dan persen */
-    }
-}
+                width: 40%; /* Lebar lebih kecil untuk mobile */
+                height: auto;
+                order: 2; /* Tetap di posisi 2 (kanan) */
+                max-height: none; /* Hapus max-height */
+                overflow-y: auto; /* KEMBALIKAN SCROLL JIKA LAYOUT BERANTAKAN DI MOBILE */
+            }
+            
+            .chart-wrapper {
+                width: 60%; /* Chart lebih lebar */
+                order: 1; /* Tetap di posisi 1 (kiri) */
+                height: 250px; /* Tinggi tetap */
+                min-height: 250px;
+            }
+            
+            .detail-item {
+                padding: 8px 10px; /* Padding lebih kecil */
+                min-height: 40px; /* Tinggi lebih kecil */
+            }
+            
+            .detail-label {
+                font-size: 0.75rem; /* Font lebih kecil */
+            }
+            
+            .detail-value {
+                font-size: 0.8rem;
+            }
+            
+            .detail-iuran,
+            .detail-percent {
+                font-size: 0.7rem; /* Font lebih kecil untuk iuran dan persen */
+            }
+        }
 
         @media (max-width: 520px) {
             .summary-cards .card {
@@ -739,66 +745,66 @@
             }
             
            .chart-with-details {
-        flex-direction: row; /* Tetap horizontal */
-        gap: 8px;
-    }
-    
-    .chart-details {
-        width: 45%;
-        padding: 8px;
-    }
-    
-    .chart-wrapper {
-        width: 55%;
-        height: 200px;
-        min-height: 200px;
-    }
-    
-    .detail-item {
-        padding: 6px 8px;
-        min-height: 35px;
-    }
-    
-    .detail-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-    
-    .detail-values {
-        align-items: flex-start;
-        width: 100%;
-        padding-top: 2px;
-        border-top: 1px solid #e5e7eb;
-    }
-    
-    .detail-label {
-        font-size: 0.7rem;
-    }
-    
-    .detail-value {
-        font-size: 0.75rem;
-    }
-    
-    .detail-iuran,
-    .detail-percent {
-        font-size: 0.65rem;
-    }
-}
+                flex-direction: row; /* Tetap horizontal */
+                gap: 8px;
+            }
+            
+            .chart-details {
+                width: 45%;
+                padding: 8px;
+            }
+            
+            .chart-wrapper {
+                width: 55%;
+                height: 200px;
+                min-height: 200px;
+            }
+            
+            .detail-item {
+                padding: 6px 8px;
+                min-height: 35px;
+            }
+            
+            .detail-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+            
+            .detail-values {
+                align-items: flex-start;
+                width: 100%;
+                padding-top: 2px;
+                border-top: 1px solid #e5e7eb;
+            }
+            
+            .detail-label {
+                font-size: 0.7rem;
+            }
+            
+            .detail-value {
+                font-size: 0.75rem;
+            }
+            
+            .detail-iuran,
+            .detail-percent {
+                font-size: 0.65rem;
+            }
+        }
 
-@media (max-width: 400px) {
-    .chart-with-details {
-        flex-direction: column; /* Kembali ke vertikal di layar sangat kecil */
-    }
-    
-    .chart-details {
-        width: 100%;
-    }
-    
-    .chart-wrapper {
-        width: 100%;
-    }
-}
+        @media (max-width: 400px) {
+            .chart-with-details {
+                flex-direction: column; /* Kembali ke vertikal di layar sangat kecil */
+            }
+            
+            .chart-details {
+                width: 100%;
+            }
+            
+            .chart-wrapper {
+                width: 100%;
+            }
+        }
 
     </style>
 </head>
@@ -817,7 +823,7 @@
 
             <div class="header-section">
                 <img src="mdnsemua.png" alt="Medan Untuk Semua" class="header-logo-small">
-                <img src="logo.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">    
+                <img src="logo.png" alt="Logo BPJS Ketenagakerjaan" class="header-logo">   
             </div>
         </header>
         
@@ -864,8 +870,7 @@
                             </div>
                             <div class="chart-details" id="statusChartDetails">
                                 <h4>Rincian Status</h4>
-                                <!-- Detail akan diisi oleh JavaScript -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -878,8 +883,7 @@
                             </div>
                             <div class="chart-details" id="sumberDanaChartDetails">
                                 <h4>Rincian Sumber Dana</h4>
-                                <!-- Detail akan diisi oleh JavaScript -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -928,6 +932,11 @@
             updateCurrentDate();
             updateConnectionStatus('loading', 'Memuat data...');
             
+            // Memuat ChartDataLabels secara dinamis
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0';
+            document.head.appendChild(script);
+
             try {
                 const data = await fetchGoogleSheetsData();
                 if (data && data.length > 0) {
@@ -1170,9 +1179,6 @@
                 } catch (e) { /* ignore */ }
             }
 
-            const maxValue = values.length ? Math.max(...values) : 0;
-            const thresholdRelative = 0.25;
-
             window.statusChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1213,52 +1219,17 @@
                                 },
                             },
                         },
+                        // Menonaktifkan datalabels untuk Status Potensi
                         datalabels: {
-                            display: true,
-                            formatter: function(value, ctx) {
-                                const idx = ctx.dataIndex;
-                                const pot = potensiValues[idx] || 0;
-                                const pct = totalPotensiAll ? (pot / totalPotensiAll) * 100 : 0;
-                                return `${value.toLocaleString('id-ID')} proyek\n${formatCurrency(pot)} (${pct.toFixed(1)}%)`;
-                            },
-                            anchor: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return val >= (maxValue * thresholdRelative) ? 'center' : 'end';
-                            },
-                            align: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return val >= (maxValue * thresholdRelative) ? 'center' : 'start';
-                            },
-                            offset: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return val >= (maxValue * thresholdRelative) ? 0 : -6;
-                            },
-                            color: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return val >= (maxValue * thresholdRelative) ? '#ffffff' : '#111';
-                            },
-                            font: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return {
-                                    weight: '600',
-                                    size: val >= (maxValue * thresholdRelative) ? 12 : 11,
-                                };
-                            },
-                            backgroundColor: function(ctx) {
-                                const val = ctx.dataset.data[ctx.dataIndex] || 0;
-                                return val >= (maxValue * thresholdRelative) ? 'transparent' : 'rgba(255,255,255,0.9)';
-                            },
-                            borderRadius: 6,
-                            padding: { top: 6, bottom: 6, left: 8, right: 8 },
-                            lineHeight: 1.05,
-                            clamp: true
+                            display: false 
                         }
                     }
                 },
-                plugins: (typeof ChartDataLabels !== 'undefined') ? [ChartDataLabels] : []
+                plugins: []
             });
         }
 
+        // FUNGSI KLIK RINCIAN STATUS
         function updateStatusChartDetails(labels, values, potensiValues, totalPotensiAll) {
             const detailsContainer = document.getElementById('statusChartDetails');
             detailsContainer.innerHTML = '<h4>Rincian Status</h4>';
@@ -1271,34 +1242,36 @@
                 const detailItem = document.createElement('div');
                 
                 let itemClass = 'detail-item';
-                let detailLink = '#';
-                if (label.toLowerCase() === 'terdaftar' || label.toLowerCase().includes('batal')) {
-            itemClass += label.toLowerCase().includes('batal') ? ' dark' : ' blue';
-            // Link ke detail-status.html untuk Terdaftar dan Batal
-            detailLink = `detail-status.html?status=${encodeURIComponent(label)}`; 
-        } else if (label.toLowerCase().includes('belum')) {
-            itemClass += ' red';
-            // Link ke detail-statusbelum.html untuk Belum Terdaftar
-            detailLink = `detail-statusbelum.html?status=${encodeURIComponent(label)}`; 
-        }
+                let targetUrl = ''; // Target URL untuk navigasi
 
-        const linkWrapper = document.createElement('a');
-        linkWrapper.href = detailLink;
-        linkWrapper.style.textDecoration = 'none'; // Menghilangkan garis bawah link
-        linkWrapper.style.color = 'inherit'; // Menggunakan warna teks bawaan
+                // Tentukan URL tujuan berdasarkan status
+                if (label.toLowerCase() === 'terdaftar' || label.toLowerCase().includes('batal')) {
+                    itemClass += label.toLowerCase().includes('batal') ? ' dark' : ' blue';
+                    targetUrl = `detail-status.html?status=${encodeURIComponent(label)}`; 
+                } else if (label.toLowerCase().includes('belum')) {
+                    itemClass += ' red';
+                    targetUrl = `detail-statusbelum.html?status=${encodeURIComponent(label)}`; 
+                }
                 
                 detailItem.className = itemClass;
-        detailItem.innerHTML = `
-            <div class="detail-content">
-                <span class="detail-label">${label}</span>
-                <div class="detail-values">
-                    <span class="detail-value">${count.toLocaleString('id-ID')}</span>
-                    <span class="detail-iuran">${formatCurrency(potensi)}</span>
-                    <span class="detail-percent">${pct.toFixed(1)}%</span>
-                </div>
-            </div>
-        `;
-        linkWrapper.appendChild(detailItem);
+                detailItem.innerHTML = `
+                    <div class="detail-content">
+                        <span class="detail-label">${label}</span>
+                        <div class="detail-values">
+                            <span class="detail-value">${count.toLocaleString('id-ID')}</span>
+                            <span class="detail-iuran">${formatCurrency(potensi)}</span>
+                            <span class="detail-percent">${pct.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+
+                // Tambahkan Event Listener untuk navigasi (Hanya jika ada URL)
+                if (targetUrl) {
+                    detailItem.addEventListener('click', () => {
+                        window.location.href = targetUrl;
+                    });
+                }
+                
                 detailsContainer.appendChild(detailItem);
             });
         }
@@ -1370,9 +1343,15 @@
                                     return `${ctx.label}: ${formatCurrency(value)} (${pct.toFixed(1)}%)`;
                                 }
                             }
+                        },
+                        // *** PERUBAHAN UTAMA DI SINI: Menonaktifkan datalabels ***
+                        datalabels: {
+                            display: false // Menonaktifkan rincian di batang diagram Sumber Dana
                         }
+                        // *******************************************************
                     }
-                }
+                },
+                plugins: []
             });
         }
 
